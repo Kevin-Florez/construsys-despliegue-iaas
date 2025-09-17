@@ -15,10 +15,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-c7z)7&vyad51nxne-5c2_9$t(pcnc!9p5=ob9ju#v8#ftv%%v!'
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
 # backend_api/settings.py
 ALLOWED_HOSTS = ['192.168.167.94', 'localhost', '127.0.0.1', '.vercel.app']
@@ -131,11 +131,11 @@ WSGI_APPLICATION = 'backend_api.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres.vfawexjsirotmhntyjap',
-        'PASSWORD': 'Kfv39206538',
-        'HOST': 'aws-1-us-east-2.pooler.supabase.com',
-        'PORT': '5432',
+        'NAME': os.environ.get('DB_NAME'),
+        'USER': os.environ.get('DB_USER'),
+        'PASSWORD': os.environ.get('DB_PASSWORD'),
+        'HOST': os.environ.get('DB_HOST'),
+        'PORT': os.environ.get('DB_PORT'),
     }
 }
 
