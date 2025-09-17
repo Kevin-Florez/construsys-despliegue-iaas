@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+{% load humanize %}  <html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Confirmación de Pedido</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f7;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border: 1px solid #dddddd;
+            border-radius: 8px;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 1px solid #eeeeee;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            font-size: 24px;
+            color: #1e3a8a;
+        }
+        .summary-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 30px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .product-list {
+            list-style: none;
+            padding: 0;
+        }
+        .product-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #f7f7f7;
+        }
+        .total {
+            text-align: right;
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-top: 15px;
+        }
+        .button-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 25px;
+            background-color: #2563eb;
+            /* ✨ CORRECCIÓN AQUÍ: Aseguramos que el texto sea siempre blanco */
+            color: #ffffff !important;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>¡Gracias por tu compra, {{ pedido.nombre_receptor }}!</h1>
+        </div>
+
+        <p>Hola de nuevo,</p>
+        <p>Hemos recibido tu pedido <strong>#{{ pedido.id }}</strong> y ya lo estamos procesando. A continuación, te dejamos un resumen de tu compra.</p>
+        
+        <p class="summary-title">Resumen del Pedido</p>
+        <ul class="product-list">
+            {% for detalle in pedido.detalles.all %}
+                <li class="product-item">
+                    <span>{{ detalle.producto.nombre }} (x{{ detalle.cantidad }})</span>
+                    <strong>${{ detalle.subtotal|floatformat:0|intcomma }}</strong>
+                </li>
+            {% endfor %}
+        </ul>
+        <p class="total">Total: ${{ pedido.total|floatformat:0|intcomma }}</p>
+
+        <div class="button-container">
+            <p>Puedes seguir el estado de tu pedido en cualquier momento a través del siguiente enlace:</p>
+            
+            <a href="{{ frontend_url }}/pedido/ver/{{ pedido.token_seguimiento }}" class="button">Ver Estado de mi Pedido</a>
+        </div>
+
+        <div class="footer">
+            <p>Gracias por confiar en Depósito y Ferretería del Sur.</p>
+        </div>
+    </div>
+</body>
+</html>

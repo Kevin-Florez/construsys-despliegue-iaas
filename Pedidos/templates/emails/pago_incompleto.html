@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Información sobre tu Pedido</title>
+    </head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Hola, {{ pedido.nombre_receptor }}</h1>
+        </div>
+        <p>Hay una actualización importante sobre tu pedido <strong>#{{ pedido.id }}</strong>.</p>
+        <div class="status-box">
+            <p>El nuevo estado es:</p>
+            <p class="status-text">Pago Incompleto</p>
+        </div>
+
+        <h3>Detalles del Pago</h3>
+        <p>Hemos revisado tu comprobante y confirmamos la recepción de <strong>${{ pedido.monto_pagado_verificado|floatformat:0|intcomma }}</strong>.</p>
+        <p>El total de tu pedido es de <strong>${{ pedido.total|floatformat:0|intcomma }}</strong>, por lo que queda un saldo pendiente de:</p>
+        <h2 style="text-align:center; color:#b91c1c;">${{ pedido.total|sub:pedido.monto_pagado_verificado|floatformat:0|intcomma }}</h2>
+
+        <p>Por favor, realiza el pago del monto restante y sube el nuevo comprobante a través del siguiente enlace para que podamos continuar con el proceso.</p>
+
+        <div class="button-container">
+            <a href="{{ frontend_url }}/pedido/ver/{{ pedido.token_seguimiento }}" class="button">Subir Comprobante Faltante</a>
+        </div>
+    </div>
+</body>
+</html>
