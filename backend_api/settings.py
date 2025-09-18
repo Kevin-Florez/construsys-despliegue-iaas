@@ -3,9 +3,13 @@
 Django settings for backend_api project.
 # ... (resto de tus comentarios y configuraciones iniciales) ...
 """
+from dotenv import load_dotenv
+import os # <<< --- AÑADE ESTA IMPORTACIÓN SI USAS os.path.join más abajo
+
+load_dotenv()
+
 
 from pathlib import Path
-import os # <<< --- AÑADE ESTA IMPORTACIÓN SI USAS os.path.join más abajo
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
