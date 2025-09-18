@@ -1,6 +1,10 @@
 {
   "routes": [
     {
+      "src": "/static/(.*)",
+      "dest": "/staticfiles/$1"
+    },
+    {
       "src": "/(.*)",
       "dest": "backend_api/wsgi.py"
     }
