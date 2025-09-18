@@ -42,8 +42,8 @@ urlpatterns = [
     
 
     # --- Rutas de Perfil ---
-    path('api/perfil/', ProfileView.as_view(), name='vista_perfil'),
-    path('api/perfil/cambiar-password/', CambiarContrasenaView.as_view(), name='perfil_cambiar_password'),
+    #path('api/perfil/', ProfileView.as_view(), name='vista_perfil'),
+    #path('api/perfil/cambiar-password/', CambiarContrasenaView.as_view(), name='perfil_cambiar_password'),
 
 
 
