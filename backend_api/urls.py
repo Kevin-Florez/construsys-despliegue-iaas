@@ -9,13 +9,14 @@ from .views import ContactoView
 from django.conf import settings
 from django.conf.urls.static import static
 # --- ✨ FIN IMPORTACIONES ✨ ---
-
+from .views import home_view
 from authentication.views import ProfileView, CheckDocumentoView
 from Usuarios.views import CambiarContrasenaView
 
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
 urlpatterns = [
+    path('', home_view, name='home'),
     path('admin/', admin.site.urls),
     
     # --- Inclusiones de URLs de las Apps ---
