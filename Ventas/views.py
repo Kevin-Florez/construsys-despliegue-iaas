@@ -40,6 +40,8 @@ from Productos.serializers import ProductoDashboardStockSerializer
 from Roles_Permisos.permissions import HasPrivilege
 from .renderers import BinaryPDFRenderer 
 
+from django.db.models import F, ExpressionWrapper, fields
+
 logger = logging.getLogger(__name__)
 
 # --- VISTA PARA EL DASHBOARD ---
@@ -74,7 +76,10 @@ class ResumenGeneralDashboardView(APIView):
         cartera_total = cartera_total_agg['total_cartera']
         creditos_activos_count = creditos_activos_qs.count()
         creditos_vencidos_count = creditos_activos_qs.annotate(
-            vencimiento_calculado=RawSQL("DATE_ADD(fecha_otorgamiento, INTERVAL plazo_dias DAY)", [])
+            vencimiento_calculado=ExpressionWrapper(
+                F('fecha_otorgamiento') + F('plazo_dias') * timedelta(days=1),
+                output_field=fields.DateField()
+            )
         ).filter(vencimiento_calculado__lt=hoy).count()
 
         # c) Datos de Productos para Reponer (sin cambios)
