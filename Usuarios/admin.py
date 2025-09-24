@@ -21,7 +21,7 @@ class CustomUserAdmin(UserAdmin):
 
     # 2. Quitamos la sección 'Fechas Importantes' del formulario de edición.
     fieldsets = (
-        (None, {'fields': ('email', 'password')}),
+        (None, {'fields': ('email', 'password')}), 
         ('Información Personal', {'fields': ('first_name', 'last_name', 'rol', 'tipo_documento', 'numero_documento', 'telefono', 'direccion')}),
         ('Permisos', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
         # La línea de 'Fechas Importantes' ha sido eliminada.
