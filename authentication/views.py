@@ -76,7 +76,7 @@ class ClienteRegistrationView(APIView):
                     f"Hola {cliente.nombre},\n\n"
                     f"Tu cuenta en ConstruSys ha sido creada exitosamente.\n\n"
                     f"Ya puedes iniciar sesión con tu correo y la contraseña que elegiste.\n"
-                    f"Inicia sesión aquí: http://localhost:5173/login\n\n"
+                    f"Inicia sesión aquí: {settings.FRONTEND_URL}/login\n\n"
                     f"Saludos,\nEl equipo de ConstruSys"
                 )
                 send_mail(subject, message_body, settings.DEFAULT_FROM_EMAIL, [cliente.correo], fail_silently=True)
