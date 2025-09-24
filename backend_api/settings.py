@@ -193,3 +193,30 @@ TASA_IVA = 19.0
 
 CORS_ALLOW_ALL_ORIGINS = True 
 
+# --- CONFIGURACIÓN PARA SUPABASE STORAGE ---
+
+# Lee las nuevas variables de entorno que añadiremos
+SUPABASE_URL = os.environ.get('SUPABASE_URL')
+SUPABASE_KEY = os.environ.get('SUPABASE_KEY')
+SUPABASE_BUCKET = os.environ.get('SUPABASE_BUCKET')
+
+if SUPABASE_URL and SUPABASE_KEY and SUPABASE_BUCKET:
+    DEFAULT_FILE_STORAGE = 'storages.backends.s3_boto3.S3Boto3Storage'
+    
+    # El 'Access Key ID' es el ID de tu proyecto de Supabase
+    AWS_ACCESS_KEY_ID = SUPABASE_URL.split('.')[0].replace('https://', '')
+    
+    # La 'Secret Access Key' es tu 'service_role' key de Supabase
+    AWS_SECRET_ACCESS_KEY = SUPABASE_KEY
+    
+    AWS_STORAGE_BUCKET_NAME = SUPABASE_BUCKET
+    AWS_S3_ENDPOINT_URL = f'{SUPABASE_URL}/storage/v1'
+    AWS_S3_OBJECT_PARAMETERS = {
+        'CacheControl': 'max-age=86400', # Cachea los archivos por 1 día
+    }
+    AWS_DEFAULT_ACL = 'public-read'
+    AWS_LOCATION = '' # Directorio raíz dentro del bucket. Puedes dejarlo vacío.
+    
+    # Esto asegura que las URLs de los archivos se generen correctamente
+    # y no se firmen con credenciales (ya que el bucket es público).
+    AWS_QUERYSTRING_AUTH = False
