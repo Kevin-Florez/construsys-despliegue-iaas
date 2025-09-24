@@ -62,6 +62,13 @@ class UsuarioCreateSerializer(serializers.ModelSerializer):
         if User.objects.filter(email=value).exists():
             raise serializers.ValidationError("Un usuario con este correo electrónico ya existe.")
         return value
+    
+
+    def validate_numero_documento(self, value):
+        if User.objects.filter(numero_documento=value).exists():
+            raise serializers.ValidationError("Ya existe un usuario con este número de documento.")
+        return value
+
 
     # ✨ --- INICIO DE LA CORRECCIÓN --- ✨
     def create(self, validated_data):

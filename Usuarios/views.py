@@ -95,12 +95,12 @@ class UsuarioRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
         # Añade aquí todos los modelos importantes donde un usuario puede estar referenciado.
         
         # Ejemplo con Ventas (ajusta 'usuario_creador' al nombre real de tu campo ForeignKey)
-        if Venta.objects.filter(usuario_creador=instance).exists():
-            raise ValidationError("Este usuario no puede ser eliminado porque tiene ventas asociadas. Por favor, desactívelo en su lugar.")
+        #if Venta.objects.filter(usuario_creador=instance).exists():
+            #raise ValidationError("Este usuario no puede ser eliminado porque tiene ventas asociadas. Por favor, desactívelo en su lugar.")
 
         # Ejemplo con Compras
-        if Compra.objects.filter(usuario_registra=instance).exists():
-            raise ValidationError("Este usuario no puede ser eliminado porque tiene compras asociadas. Por favor, desactívelo en su lugar.")
+        #if Compra.objects.filter(usuario_registra=instance).exists():
+            #raise ValidationError("Este usuario no puede ser eliminado porque tiene compras asociadas. Por favor, desactívelo en su lugar.")
 
         # Puedes añadir más comprobaciones aquí...
         # if Producto.objects.filter(usuario=instance).exists():
