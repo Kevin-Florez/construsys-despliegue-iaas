@@ -152,7 +152,7 @@ class UnifiedPasswordResetRequestView(APIView):
                 token_instance = PasswordResetToken.objects.create(content_object=user_or_cliente)
                 
                 # La URL del frontend debe ser genérica ahora
-                reset_url = f"http://localhost:5173/reset-password/{token_instance.token}" # Ajusta esta URL si es diferente
+                reset_url = f"{settings.FRONTEND_URL}/reset-password/{token_instance.token}"
                 
                 subject = "Restablecer su Contraseña - ConstruSys"
                 message = (

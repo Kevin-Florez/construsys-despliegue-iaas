@@ -185,9 +185,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 PASSWORD_RESET_TIMEOUT_SECONDS = 3600
 
 
-FRONTEND_URL = 'http://localhost:5173'
+# settings.py
+FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://localhost:5173')
 
 
 TASA_IVA = 19.0
 
 CORS_ALLOW_ALL_ORIGINS = True 
+

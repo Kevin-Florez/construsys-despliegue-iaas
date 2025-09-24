@@ -129,7 +129,7 @@ class ClienteRegistrationSerializer(serializers.ModelSerializer): # Para auto-re
                 f"Hola {cliente.nombre},\n\n"
                 f"¡Gracias por registrarte en ConstruSys! Tu cuenta ha sido creada exitosamente.\n\n"
                 f"Ya puedes iniciar sesión con tu correo electrónico y la contraseña que elegiste.\n"
-                f"Visítanos en: http://localhost:5173/login\n\n" 
+                f"Visítanos en: {settings.FRONTEND_URL}/login\n\n" 
                 f"Si tienes alguna pregunta o necesitas asistencia, no dudes en contactarnos.\n\n"
                 f"Saludos cordiales,\nEl equipo de ConstruSys"
             )
