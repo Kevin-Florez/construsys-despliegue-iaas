@@ -44,7 +44,7 @@ class ClienteSerializer(serializers.ModelSerializer):
                     f"Puede iniciar sesión utilizando su correo electrónico ({cliente.correo}) y la siguiente contraseña temporal:\n"
                     f"Contraseña Temporal: {temporary_password}\n\n"
                     f"Por su seguridad, el sistema le pedirá que cambie esta contraseña inmediatamente después de iniciar sesión.\n"
-                    f"Puede iniciar sesión en: http://localhost:5173/login\n\n"
+                    f"Puede iniciar sesión en: {settings.FRONTEND_URL}/login\n\n"
                     f"Saludos cordiales,\nEl equipo de ConstruSys"
                 )
                 send_mail(

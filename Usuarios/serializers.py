@@ -94,7 +94,7 @@ class UsuarioCreateSerializer(serializers.ModelSerializer):
             f'Usuario (para iniciar sesión): {user.email}\n'
             f'Contraseña Temporal: {temp_password}\n\n'
             'Por favor, inicia sesión y el sistema te guiará para cambiar tu contraseña.\n'
-            f"Puede iniciar sesión en: http://localhost:5173/login\n\n"
+            f"Puede iniciar sesión en: {settings.FRONTEND_URL}/login\n\n"
             f"Saludos cordiales,\nEl equipo del Sistema"
         )
         try:
