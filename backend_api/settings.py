@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt', 
     'drf_spectacular',
 
+    'storages',
+
     'authentication.apps.AuthenticationConfig',
     'Productos.apps.ProductosConfig',
     'Clientes.apps.ClientesConfig',
@@ -178,7 +180,7 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 MEDIA_URL = '/media/'
 
 # Define la ruta en el disco duro donde se guardarán los archivos subidos.
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+#MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
