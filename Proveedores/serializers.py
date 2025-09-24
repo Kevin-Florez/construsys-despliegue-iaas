@@ -7,7 +7,8 @@ class ProveedorSerializer(serializers.ModelSerializer):
         model = Proveedor
         fields = [
             'id', 'nombre', 'tipo_documento', 'documento', 'telefono',
-            'correo', 'direccion', 'contacto', 'estado', 'fecha_registro' # ✨ CORREO AÑADIDO AQUÍ ✨
+            'correo', 'direccion', 'contacto', 'estado', 'fecha_registro',
+            'es_empresa'  # <--- AÑADE ESTE CAMPO AL FINAL
         ]
         read_only_fields = ['id', 'fecha_registro']
 

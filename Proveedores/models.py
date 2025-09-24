@@ -32,6 +32,9 @@ class Proveedor(models.Model):
         default='Activo',
         verbose_name="Estado"
     )
+
+    es_empresa = models.BooleanField(default=False, verbose_name="¿Es una empresa?")
+
     fecha_registro = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de registro")
 
     def __str__(self):
