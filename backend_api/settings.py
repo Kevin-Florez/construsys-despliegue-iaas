@@ -195,16 +195,25 @@ TASA_IVA = 19.0
 
 CORS_ALLOW_ALL_ORIGINS = True 
 
-# settings.py
+# backend_api/settings.py (reemplaza tu bloque de Supabase al final del archivo)
 
-# ... (al final del archivo) ...
+# --- CONFIGURACIÓN A PRUEBA DE ERRORES PARA SUPABASE STORAGE ---
 
-# settings.py (al final del archivo)
-
-# --- CONFIGURACIÓN SIMPLIFICADA PARA SUPABASE STORAGE ---
+# 1. Leemos las variables de entorno de Vercel
 SUPABASE_KEY = os.environ.get('SUPABASE_KEY')
 SUPABASE_BUCKET = os.environ.get('SUPABASE_BUCKET')
 SUPABASE_PROJECT_ID = os.environ.get('SUPABASE_PROJECT_ID')
+
+# 2. Verificación "a prueba de fallos"
+# Si alguna de las variables no existe, detenemos el programa con un error claro.
+if not all([SUPABASE_KEY, SUPABASE_BUCKET, SUPABASE_PROJECT_ID]):
+    raise ValueError(
+        "ERROR CRÍTICO: Faltan una o más variables de entorno de Supabase. "
+        "Verifica que SUPABASE_KEY, SUPABASE_BUCKET, y SUPABASE_PROJECT_ID existan en Vercel."
+    )
+
+# 3. Si todas las variables existen, procedemos a configurar el almacenamiento
+print("✅ Todas las variables de Supabase detectadas. Configurando DEFAULT_FILE_STORAGE...")
 
 DEFAULT_FILE_STORAGE = 'storages.backends.s3_boto3.S3Boto3Storage'
 
@@ -217,3 +226,5 @@ AWS_S3_OBJECT_PARAMETERS = {
 }
 AWS_DEFAULT_ACL = 'public-read'
 AWS_QUERYSTRING_AUTH = False
+
+print("✅ DEFAULT_FILE_STORAGE configurado para usar S3Boto3Storage.")
