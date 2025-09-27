@@ -233,3 +233,12 @@ CORS_ALLOW_ALL_ORIGINS = True
 
 # backend_api/settings.py (reemplaza tu bloque de Supabase al final del archivo)
 
+
+
+
+# settings.py (al final de todo el archivo)
+
+print("--- VERIFICACIÓN DE CONFIGURACIÓN ---")
+print(f"MODO DEBUG: {DEBUG}")
+print(f"ALMACENAMIENTO POR DEFECTO: {DEFAULT_FILE_STORAGE}")
+print("---------------------------------")
