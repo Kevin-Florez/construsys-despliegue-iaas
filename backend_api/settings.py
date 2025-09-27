@@ -249,3 +249,6 @@ print("--- VERIFICACIÓN DE CONFIGURACIÓN ---")
 print(f"MODO DEBUG: {DEBUG}")
 print(f"ALMACENAMIENTO POR DEFECTO: {DEFAULT_FILE_STORAGE}")
 print("---------------------------------")
+
+
+# Forzando un nuevo despliegue en Vercel
