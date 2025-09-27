@@ -26,27 +26,32 @@ SUPABASE_KEY = os.environ.get('SUPABASE_KEY')
 SUPABASE_BUCKET = os.environ.get('SUPABASE_BUCKET')
 SUPABASE_PROJECT_ID = os.environ.get('SUPABASE_PROJECT_ID')
 
-# 2. Verificación "a prueba de fallos"
-# Si alguna de las variables no existe, detenemos el programa con un error claro.
+# 2. Imprimimos los valores que estamos recibiendo para depurar
+print("--- VERIFICACIÓN DE VARIABLES DE ENTORNO ---")
+print(f"SUPABASE_PROJECT_ID: {SUPABASE_PROJECT_ID}")
+print(f"SUPABASE_BUCKET: {SUPABASE_BUCKET}")
+# No imprimimos la clave por seguridad, solo si existe
+print(f"SUPABASE_KEY (existe?): {bool(SUPABASE_KEY)}")
+print("-----------------------------------------")
+
+
+# 3. Verificación "a prueba de fallos"
+# Si alguna de las variables no existe o está vacía, detenemos la ejecución con un error claro.
 if not all([SUPABASE_KEY, SUPABASE_BUCKET, SUPABASE_PROJECT_ID]):
     raise ValueError(
-        "ERROR CRÍTICO: Faltan una o más variables de entorno de Supabase. "
-        "Verifica que SUPABASE_KEY, SUPABASE_BUCKET, y SUPABASE_PROJECT_ID existan en Vercel."
+        "ERROR CRÍTICO: Una o más variables de entorno de Supabase faltan o están vacías. "
+        "Verifica que SUPABASE_KEY, SUPABASE_BUCKET, y SUPABASE_PROJECT_ID existan y tengan valor en Vercel."
     )
 
-# 3. Si todas las variables existen, procedemos a configurar el almacenamiento
-print("✅ Todas las variables de Supabase detectadas. Configurando DEFAULT_FILE_STORAGE...")
+# 4. Si todas las variables existen, procedemos a configurar el almacenamiento
+print("✅ Todas las variables de Supabase existen. Configurando DEFAULT_FILE_STORAGE...")
 
-# settings.py - CORRECTO
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-
 AWS_ACCESS_KEY_ID = SUPABASE_PROJECT_ID
 AWS_SECRET_ACCESS_KEY = SUPABASE_KEY
 AWS_STORAGE_BUCKET_NAME = SUPABASE_BUCKET
 AWS_S3_ENDPOINT_URL = f'https://{SUPABASE_PROJECT_ID}.supabase.co/storage/v1'
-AWS_S3_OBJECT_PARAMETERS = {
-    'CacheControl': 'max-age=86400',
-}
+AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
 AWS_DEFAULT_ACL = 'public-read'
 AWS_QUERYSTRING_AUTH = False
 
