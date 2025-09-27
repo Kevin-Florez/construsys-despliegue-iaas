@@ -8,8 +8,6 @@ import os # <<< --- AÑADE ESTA IMPORTACIÓN SI USAS os.path.join más abajo
 
 
 
-raise ValueError("PRUEBA DE DESPLIEGUE v3 - SI VES ESTO, EL CÓDIGO NUEVO ESTÁ EN VERCEL")
-
 load_dotenv()
 
 
