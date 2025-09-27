@@ -35,7 +35,8 @@ if not all([SUPABASE_KEY, SUPABASE_BUCKET, SUPABASE_PROJECT_ID]):
 # 3. Si todas las variables existen, procedemos a configurar el almacenamiento
 print("✅ Todas las variables de Supabase detectadas. Configurando DEFAULT_FILE_STORAGE...")
 
-DEFAULT_FILE_STORAGE = 'storages.backends.s3_boto3.S3Boto3Storage'
+# settings.py - CORRECTO
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 AWS_ACCESS_KEY_ID = SUPABASE_PROJECT_ID
 AWS_SECRET_ACCESS_KEY = SUPABASE_KEY
