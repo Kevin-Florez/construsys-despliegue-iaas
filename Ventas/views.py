@@ -256,7 +256,7 @@ class GenerarVentaPDFView(APIView):
 
         # --- Sección 1: Encabezado de la Venta ---
         cliente_info_str = f"<b>CLIENTE:</b> {venta.cliente.nombre} {venta.cliente.apellido or ''}".strip()
-        doc_info_str = f"<b>DOC:</b> {venta.cliente.get_tipo_documento_display()} {venta.cliente.documento}"
+        doc_info_str = f"{venta.cliente.get_tipo_documento_display()} {venta.cliente.documento}"
         
         header_data = [
             [Paragraph(cliente_info_str, style_normal), Paragraph(f"<b>FACTURA N°: {venta.id}</b>", style_normal_right)],
