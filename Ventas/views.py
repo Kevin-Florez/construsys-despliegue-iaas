@@ -259,7 +259,7 @@ class GenerarVentaPDFView(APIView):
         doc_info_str = f"{venta.cliente.get_tipo_documento_display()} {venta.cliente.documento}"
         
         header_data = [
-            [Paragraph(cliente_info_str, style_normal), Paragraph(f"<b>FACTURA N°: {venta.id}</b>", style_normal_right)],
+            [Paragraph(cliente_info_str, style_normal), Paragraph(f"<b>COMPROBANTE DE VENTA N°: {venta.id}</b>", style_normal_right)],
             [Paragraph(doc_info_str, style_normal), Paragraph(f"<b>FECHA VENTA:</b> {venta.fecha.strftime('%d/%m/%Y')}", style_normal_right)],
         ]
         header_table = Table(header_data, colWidths=[4*inch, 3.5*inch])
