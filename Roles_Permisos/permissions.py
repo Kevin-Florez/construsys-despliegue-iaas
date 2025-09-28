@@ -8,21 +8,10 @@ class HasPrivilege(BasePermission):
     Permiso personalizado para verificar si el rol del usuario autenticado
     tiene un privilegio específico (codename) requerido por la vista.
     
-    Uso en una vista:
-    permission_classes = [IsAuthenticated, HasPrivilege]
-    
-    Para vistas de solo lectura (GET, LIST):
-    required_privilege = 'modulo_ver'
-    
-    Para vistas con múltiples acciones (Crear, Editar, etc.):
-    def get_required_privilege(self, method):
-        if self.request.method == 'POST':
-            return 'modulo_crear'
-        if self.request.method in ['PUT', 'PATCH']:
-            return 'modulo_editar'
-        if self.request.method == 'DELETE':
-            return 'modulo_eliminar'
-        return None # Denegar por defecto si no se especifica
+    LÓGICA MEJORADA:
+    - Si el permiso requerido termina en '_ver' (ej: 'ventas_ver'), la comprobación
+      será exitosa si el usuario tiene CUALQUIER permiso para ese módulo (ej: 'ventas_crear').
+    - Para otros permisos (ej: 'ventas_crear'), se busca la coincidencia exacta.
     """
     
     def has_permission(self, request, view):
@@ -37,25 +26,32 @@ class HasPrivilege(BasePermission):
         # Determinar el privilegio requerido por la vista
         required_privilege = None
         if hasattr(view, 'get_required_privilege'):
-            # Para vistas con múltiples acciones (POST, PUT, etc.)
             required_privilege = view.get_required_privilege(request.method)
         elif hasattr(view, 'required_privilege'):
-            # Para vistas con una sola acción (GET)
             required_privilege = view.required_privilege
 
         if not required_privilege:
             # Por seguridad, si una vista usa este permiso, DEBE definir el privilegio.
             return False
 
-        # Verificar si el rol del usuario (si existe y está activo) tiene el privilegio.
-        if hasattr(request.user, 'rol') and request.user.rol and request.user.rol.activo:
-            # Esta consulta es muy eficiente si los permisos del usuario se cargan
-            # al inicio (prefetch_related en la vista de login/perfil)
-            return request.user.rol.permisos.filter(codename=required_privilege).exists()
+        # Si el usuario no tiene un rol activo, denegar acceso.
+        if not hasattr(request.user, 'rol') or not request.user.rol or not request.user.rol.activo:
+            return False
 
-        return False
-    
-
+        # ✨ --- INICIO DE LA LÓGICA MEJORADA --- ✨
+        # Si el permiso requerido es para 'ver', comprobamos si tiene CUALQUIER privilegio del módulo.
+        if required_privilege.endswith('_ver'):
+            # Extraemos el nombre del módulo. Ej: 'ventas_ver' -> 'ventas'
+            module_name_prefix = required_privilege.rsplit('_', 1)[0] + "_"
+            
+            # Verificamos si existe algún permiso que comience con el prefijo del módulo.
+            # Ej: 'ventas_crear', 'ventas_editar', etc.
+            return request.user.rol.permisos.filter(codename__startswith=module_name_prefix).exists()
+        
+        # Si el permiso no es de 'ver' (ej: 'ventas_crear'), se mantiene la lógica original
+        # de buscar el privilegio exacto.
+        return request.user.rol.permisos.filter(codename=required_privilege).exists()
+        # ✨ --- FIN DE LA LÓGICA MEJORADA --- ✨
 
 class IsAdminOrReadOnly(permissions.BasePermission):
     """
@@ -63,11 +59,6 @@ class IsAdminOrReadOnly(permissions.BasePermission):
     pero solo permitir escritura (POST, PUT, PATCH, DELETE) a los administradores autenticados.
     """
     def has_permission(self, request, view):
-        # El acceso de lectura (GET, HEAD, OPTIONS) está permitido para cualquiera,
-        # esté logueado o no.
         if request.method in permissions.SAFE_METHODS:
             return True
-
-        # Para cualquier otro método (escritura), el usuario debe estar
-        # autenticado Y ser un administrador (is_staff).
         return bool(request.user and request.user.is_authenticated and request.user.is_staff)
