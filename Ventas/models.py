@@ -130,9 +130,19 @@ class DetalleVenta(models.Model):
     producto = models.ForeignKey('Productos.Producto', on_delete=models.PROTECT)
     producto_nombre_historico = models.CharField(max_length=200)
     precio_unitario_venta = models.DecimalField(max_digits=10, decimal_places=2)
+
+    iva_unitario = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+
     costo_unitario_historico = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
     cantidad = models.PositiveIntegerField(default=1)
     subtotal = models.DecimalField(max_digits=12, decimal_places=2)
+
+
+    @property
+    def precio_final_unitario_con_iva(self):
+        """Devuelve el precio de una sola unidad incluyendo su IVA."""
+        return self.precio_unitario_venta + self.iva_unitario
+    # ✨ --- FIN DE CAMBIOS --- ✨
 
     def save(self, *args, **kwargs):
         self.subtotal = Decimal(self.cantidad) * self.precio_unitario_venta

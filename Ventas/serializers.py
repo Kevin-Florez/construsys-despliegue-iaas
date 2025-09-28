@@ -20,10 +20,20 @@ logger = logging.getLogger(__name__)
 class DetalleVentaReadSerializer(serializers.ModelSerializer):
     # Usamos 'producto_nombre_historico' para asegurar que el nombre sea el del momento de la venta
     producto_nombre = serializers.CharField(source='producto_nombre_historico', read_only=True)
-    
+    # ✨ --- INICIO DE CAMBIOS --- ✨
+    precio_final_unitario = serializers.DecimalField(
+        source='precio_final_unitario_con_iva', 
+        max_digits=12, 
+        decimal_places=2, 
+        read_only=True
+    )
+    # ✨ --- FIN DE CAMBIOS --- ✨
+
     class Meta:
         model = DetalleVenta
-        fields = ['id', 'producto_nombre', 'cantidad', 'precio_unitario_venta', 'costo_unitario_historico', 'subtotal']
+        # ✨ --- INICIO DE CAMBIOS --- ✨
+        fields = ['id', 'producto_nombre', 'cantidad', 'precio_unitario_venta', 'iva_unitario', 'precio_final_unitario', 'costo_unitario_historico', 'subtotal']
+        # ✨ --- FIN DE CAMBIOS --- ✨
 
 class VentaReadSerializer(serializers.ModelSerializer):
     cliente_info = serializers.SerializerMethodField()
@@ -143,21 +153,27 @@ class VentaCreateSerializer(serializers.ModelSerializer):
         venta = Venta.objects.create(**validated_data)
 
         calculated_subtotal = Decimal('0.00')
+        TASA_IVA = Decimal('0.19')
+
         for item_data in items_data:
             producto = Producto.objects.get(pk=item_data['producto_id'])
             precio_unitario = Decimal(item_data['precio_unitario_venta'])
             cantidad = item_data['cantidad']
             
-            # ✨ CORRECCIÓN 6: Creamos una instancia del modelo renombrado
+            # ✨ --- INICIO DE CAMBIOS --- ✨
+            iva_unitario_calculado = precio_unitario * TASA_IVA
+            
+            # Creamos la instancia del detalle de venta incluyendo el IVA por unidad
             DetalleVenta.objects.create(
                 venta=venta,
                 producto=producto,
                 cantidad=cantidad,
                 precio_unitario_venta=precio_unitario,
+                iva_unitario=iva_unitario_calculado # Guardamos el IVA unitario
             )
+            # ✨ --- FIN DE CAMBIOS --- ✨
             calculated_subtotal += (cantidad * precio_unitario)
 
-        TASA_IVA = Decimal('0.19')
         venta.subtotal = calculated_subtotal
         venta.iva = venta.subtotal * TASA_IVA
         venta.total = venta.subtotal + venta.iva

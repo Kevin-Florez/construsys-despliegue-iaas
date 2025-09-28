@@ -118,16 +118,30 @@ class DevolucionCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(f"La venta original con ID {value} no existe.")
         return venta
     
-    # IMPLEMENTACIÓN: Validación para requerir método de pago o reembolso según el balance
     def validate(self, data):
         items_devueltos_data = data.get('items_devueltos', [])
         items_cambio_data = data.get('items_cambio', [])
         
+        # Obtenemos los detalles de la venta para acceder a sus propiedades
+        detalles_venta = {
+            dv.id: dv for dv in DetalleVenta.objects.filter(
+                id__in=[item['item_venta_original_id'] for item in items_devueltos_data]
+            )
+        }
+
+        # Calculamos el total devuelto usando el precio CON IVA
         total_devolucion = sum(
-            DetalleVenta.objects.get(pk=item['item_venta_original_id']).precio_unitario_venta * item['cantidad_a_devolver'] 
-            for item in items_devueltos_data
+            detalles_venta[item['item_venta_original_id']].precio_final_unitario_con_iva * item['cantidad_a_devolver']
+            for item in items_devueltos_data if item['item_venta_original_id'] in detalles_venta
         )
-        total_cambio = sum(Decimal(item['precio_unitario_actual']) * item['cantidad'] for item in items_cambio_data)
+        
+        # El total de cambio se calcula con IVA, así que necesitamos añadirlo
+        TASA_IVA = Decimal('0.19')
+        total_cambio = sum(
+            (Decimal(item['precio_unitario_actual']) * (Decimal('1') + TASA_IVA)) * item['cantidad']
+            for item in items_cambio_data
+        )
+
         balance_provisional = total_cambio - total_devolucion
 
         if balance_provisional > 0 and 'metodo_pago_adicional' not in data:
@@ -149,11 +163,26 @@ class DevolucionCreateSerializer(serializers.ModelSerializer):
         if not items_devueltos_data:
             raise serializers.ValidationError("Debe haber al menos un producto devuelto.")
 
+        # ✨ --- INICIO DE CAMBIOS --- ✨
+        # Obtenemos los detalles de la venta una sola vez
+        detalles_venta = {
+            dv.id: dv for dv in DetalleVenta.objects.filter(
+                id__in=[item['item_venta_original_id'] for item in items_devueltos_data]
+            )
+        }
+        
+        # Calculamos el total de devolución con el precio final (IVA incluido)
         total_devolucion = sum(
-            DetalleVenta.objects.get(pk=item['item_venta_original_id']).precio_unitario_venta * item['cantidad_a_devolver'] 
-            for item in items_devueltos_data
+            detalles_venta[item['item_venta_original_id']].precio_final_unitario_con_iva * item['cantidad_a_devolver']
+            for item in items_devueltos_data if item['item_venta_original_id'] in detalles_venta
         )
-        total_cambio = sum(Decimal(item['precio_unitario_actual']) * item['cantidad'] for item in items_cambio_data)
+
+        # Calculamos el total de cambio con el precio final (IVA incluido)
+        TASA_IVA = Decimal('0.19')
+        total_cambio = sum(
+            (Decimal(item['precio_unitario_actual']) * (Decimal('1') + TASA_IVA)) * item['cantidad']
+            for item in items_cambio_data
+        )
         
         devolucion = Devolucion.objects.create(
             venta_original=venta_original, cliente=venta_original.cliente,
@@ -170,9 +199,10 @@ class DevolucionCreateSerializer(serializers.ModelSerializer):
             
             ItemDevuelto.objects.create(
                 devolucion=devolucion, producto=producto_devuelto, cantidad=cantidad_devuelta,
-                precio_unitario_historico=item_original.precio_unitario_venta, motivo=motivo
+                # Guardamos el precio SIN IVA, ya que el cálculo del total se hace con el precio final
+                precio_unitario_historico=item_original.precio_unitario_venta, 
+                motivo=motivo
             )
-            
             # --- INICIO DE CAMBIOS ---
             # Solo se reabastece si el motivo lo permite.
             # Los productos defectuosos NO reabastecen el stock aquí. Quedan pendientes
