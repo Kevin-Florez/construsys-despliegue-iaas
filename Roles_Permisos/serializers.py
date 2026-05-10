@@ -5,7 +5,6 @@ from .models import Rol, Permiso
 class PermisoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Permiso
-        # ✅ CORRECCIÓN: Añadir 'codename' y 'modulo' a los campos
         fields = ['id', 'nombre', 'codename', 'modulo']
         read_only_fields = ['id', 'codename', 'modulo']
 
@@ -23,7 +22,7 @@ class RolSerializer(serializers.ModelSerializer):
     class Meta:
         model = Rol
         fields = [
-            'id', 'nombre', 'descripcion', 'activo', # ✅ Se añade 'descripcion'
+            'id', 'nombre', 'descripcion', 'activo', 
             'permisos',
             'permisos_ids',
             'usuarios_asignados_count'
@@ -31,7 +30,7 @@ class RolSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'permisos']
 
     def get_usuarios_asignados_count(self, obj_rol_instance):
-        # Esta función está correcta
+        
         if hasattr(obj_rol_instance, 'usuarios') and obj_rol_instance.usuarios is not None:
             return obj_rol_instance.usuarios.count()
         return 0
