@@ -18,9 +18,8 @@ class CategoriaProducto(models.Model):
 
 class Marca(models.Model):
     nombre = models.CharField(max_length=100, unique=True, verbose_name="Nombre de la Marca")
-    # --- INICIO DE CAMBIOS ---
+    
     activo = models.BooleanField(default=True, verbose_name="Activo")
-    # --- FIN DE CAMBIOS ---
     
     class Meta:
         verbose_name = "Marca"
@@ -33,7 +32,7 @@ class Marca(models.Model):
 class Producto(models.Model):
     # Productos/models.py -> class Producto
     categoria = models.ForeignKey(
-    CategoriaProducto, on_delete=models.PROTECT, # Cambiar a PROTECT
+    CategoriaProducto, on_delete=models.PROTECT,
     null=True, blank=True, verbose_name="Categoría", related_name="productos"
 )
     
@@ -65,12 +64,10 @@ class Producto(models.Model):
     material = models.CharField(max_length=100, blank=True, verbose_name="Material Principal")
     otros_detalles = models.TextField(blank=True, verbose_name="Otros Detalles", help_text="Cualquier otra especificación relevante.")
     
-    # --- INICIO DE CAMBIOS ---
-    # 1. Se renombra 'precio_venta_sugerido' a 'precio_venta'
+
     precio_venta = models.DecimalField(max_digits=12, decimal_places=2, default=0, verbose_name="Precio de Venta")
-    # 2. Se añade campo para el último margen
+    # Se añade campo para el último margen
     ultimo_margen_aplicado = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True, verbose_name="Último Margen Aplicado (%)")
-    # --- FIN DE CAMBIOS ---
     
     ultimo_costo_compra = models.DecimalField(max_digits=12, decimal_places=2, default=0.00, verbose_name="Último Costo de Compra")
     stock_actual = models.IntegerField(default=0, verbose_name="Stock Actual (Vendible)")
