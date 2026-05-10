@@ -3,7 +3,7 @@
 from django.contrib.auth import get_user_model
 from Clientes.models import Cliente
 
-User = get_user_model()  # Tu CustomUser
+User = get_user_model()  # Mi CustomUser
 
 class UsuarioBackend:
     """
@@ -11,7 +11,7 @@ class UsuarioBackend:
     Este backend solo conoce el modelo CustomUser.
     """
     def authenticate(self, request, username=None, correo=None, password=None, **kwargs):
-        # Acepta 'username' (del admin de Django) o 'correo' (de tu API)
+        # Acepta 'username' (del admin de Django) o 'correo' (de la API)
         email = username or correo
         if not email:
             return None
@@ -46,7 +46,7 @@ class ClienteBackend:
 
         try:
             cliente = Cliente.objects.get(correo=email)
-            # Usamos la propiedad 'is_active' que definiste en el modelo Cliente
+            # Usamos la propiedad 'is_active' que definimos en el modelo Cliente
             if cliente.check_password(password) and cliente.is_active:
                 return cliente  # Autenticación exitosa para un Cliente
         except Cliente.DoesNotExist:
