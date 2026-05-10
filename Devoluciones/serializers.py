@@ -10,9 +10,8 @@ from Creditos.models import Credito
 from rest_framework.exceptions import ValidationError
 from Clientes.models import Cliente
 from Stock.serializers import GestionProveedorReadSerializer
-# --- FIN DE CAMBIOS ---
 
-# --- INICIO DE CAMBIOS: Nuevo Serializador Mínimo para el Cliente ---
+
 class MiniClienteSerializer(serializers.ModelSerializer):
     nombre_completo = serializers.SerializerMethodField()
     tipo_documento_display_corto = serializers.SerializerMethodField()
@@ -44,10 +43,9 @@ class ItemCambioReadSerializer(serializers.ModelSerializer):
         fields = ['id', 'producto_nombre', 'cantidad', 'precio_unitario_actual', 'subtotal']
 
 class DevolucionReadSerializer(serializers.ModelSerializer):
-    # --- INICIO DE CAMBIOS: Usar el nuevo serializador para el cliente ---
+    # --- Usar el nuevo serializador para el cliente ---
     cliente = MiniClienteSerializer(read_only=True)
     gestion_proveedor = GestionProveedorReadSerializer(read_only=True) # Incluimos la gestión aquí
-    # --- FIN DE CAMBIOS ---
     
     items_devueltos = ItemDevueltoReadSerializer(many=True, read_only=True)
     items_cambio = ItemCambioReadSerializer(many=True, read_only=True)
@@ -86,7 +84,7 @@ class DevolucionCreateSerializer(serializers.ModelSerializer):
         required=False, write_only=True
     )
     
-    # IMPLEMENTACIÓN: Nuevo campo para recibir el método de pago desde el frontend
+    #  Nuevo campo para recibir el método de pago desde el frontend
     metodo_pago_adicional = serializers.ChoiceField(
         choices=Devolucion.METODO_PAGO_ADICIONAL_CHOICES, 
         required=False, write_only=True
@@ -101,7 +99,7 @@ class DevolucionCreateSerializer(serializers.ModelSerializer):
             'total_productos_devueltos', 'total_productos_cambio', 'balance_final', 'fecha_devolucion',
             'monto_abonado_credito', 'monto_reembolsado_efectivo',
             'tipo_reembolso', 'estado_del_cambio',
-            'metodo_pago_adicional' # IMPLEMENTACIÓN: Añadir campo a la lista
+            'metodo_pago_adicional' # Añadir campo a la lista
         ]
         read_only_fields = [
             'id', 'total_productos_devueltos', 'total_productos_cambio', 
@@ -203,14 +201,14 @@ class DevolucionCreateSerializer(serializers.ModelSerializer):
                 precio_unitario_historico=item_original.precio_unitario_venta, 
                 motivo=motivo
             )
-            # --- INICIO DE CAMBIOS ---
+            
             # Solo se reabastece si el motivo lo permite.
             # Los productos defectuosos NO reabastecen el stock aquí. Quedan pendientes
             # para ser gestionados en el módulo de devoluciones a proveedor.
             if ItemDevuelto.puede_reabastecer(motivo):
                 producto_devuelto.stock_actual += cantidad_devuelta
                 producto_devuelto.save(update_fields=['stock_actual'])
-            # --- FIN DE CAMBIOS ---
+           
 
         for item_data in items_cambio_data:
             producto_nuevo = Producto.objects.get(pk=item_data['producto_id'])
@@ -242,7 +240,7 @@ class DevolucionCreateSerializer(serializers.ModelSerializer):
                 devolucion.tipo_reembolso = 'EFECTIVO'
             
         elif devolucion.balance_final > 0: # El cliente debe a la empresa
-            # IMPLEMENTACIÓN: Manejar el pago del cliente.
+            # Manejar el pago del cliente.
             monto_a_pagar_cliente = devolucion.balance_final
             devolucion.monto_pagado_adicional = monto_a_pagar_cliente
             devolucion.metodo_pago_adicional = metodo_pago_adicional_elegido
