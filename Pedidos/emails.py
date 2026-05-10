@@ -8,7 +8,6 @@ from django.conf import settings
 def enviar_correo_confirmacion_pedido(pedido):
     asunto = f"Confirmación de tu pedido #{pedido.id} en Depósito y Ferretería del Sur"
     
-    # 🔥 CORRECCIÓN AQUÍ: Cambiamos .email por .correo
     destinatario = pedido.cliente.correo if pedido.cliente else pedido.email_invitado
     
     contexto = {
@@ -30,7 +29,6 @@ def enviar_correo_actualizacion_estado(pedido):
     estado_amigable = pedido.get_estado_display()
     asunto = f"Actualización de tu pedido #{pedido.id}: ¡Ahora está {estado_amigable}!"
     
-    # 🔥 CORRECCIÓN AQUÍ TAMBIÉN: Cambiamos .email por .correo
     destinatario = pedido.cliente.correo if pedido.cliente else pedido.email_invitado
     
     contexto = {
