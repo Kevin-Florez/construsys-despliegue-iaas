@@ -11,7 +11,6 @@ from .views import (
     UnirCarritosView,
     ActualizarCarritoView,
     CarritoActivoView,
-    # ✨ NUEVA VISTA: Para la consulta de pedidos por cliente (invitado)
     ClientePedidoListView,
     PedidoDetailView
 )
@@ -31,10 +30,10 @@ urlpatterns = [
     path('pedidos/ver/<uuid:token_seguimiento>/', GuestPedidoStatusView.as_view(), name='guest-pedido-status'),
     path('pedidos/consultar/', GuestPedidoLookupView.as_view(), name='guest-pedido-lookup'),
     
-    # ✨ NUEVA URL: Consulta de pedidos por documento
+    # Consulta de pedidos por documento
     path('pedidos/consulta-documento/', ClientePedidoListView.as_view(), name='cliente-pedido-list'),
 
-    # NUEVA URL para que el cliente pueda subir más comprobantes
+    # URL para que el cliente pueda subir más comprobantes
     path('pedidos/ver/<uuid:token_seguimiento>/agregar-comprobante/', AgregarComprobanteView.as_view(), name='guest-agregar-comprobante'),
 
     # URLs para el administrador
