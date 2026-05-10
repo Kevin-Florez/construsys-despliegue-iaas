@@ -1,6 +1,5 @@
 # Ventas/urls.py
 from django.urls import path
-# ✨ 1. Importamos solo las vistas que realmente existen y usamos
 from .views import (
     ResumenGeneralDashboardView,
     VentaListCreateView,
@@ -12,7 +11,6 @@ from .views import (
 
 urlpatterns = [
     # --- RUTA PARA EL DASHBOARD ---
-    # Esta es la única URL de dashboard que necesitamos en esta app
     path('resumen-general-dashboard/', ResumenGeneralDashboardView.as_view(), name='resumen-general-dashboard'),
     
     path('admin/dashboard/mobile/', MobileDashboardView.as_view(), name='mobile-dashboard'),
