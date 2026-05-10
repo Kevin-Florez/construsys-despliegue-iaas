@@ -31,7 +31,6 @@ from .serializers import (
     AbonoCreditoCreateSerializer, AbonoCreditoReadSerializer,
     CreditoDashboardSerializer,
     SolicitudCreditoCreateSerializer, SolicitudCreditoReadSerializer,
-    # ✨ Importamos el serializer renombrado
     SolicitudDecisionSerializer
 )
 from .renderers import BinaryPDFRenderer
@@ -77,7 +76,7 @@ class CreditosResumenDashboardView(APIView):
         }
         return Response(data)
 
-class CreditoListCreateView(generics.ListAPIView): # Cambiado de ListCreateAPIView a ListAPIView
+class CreditoListCreateView(generics.ListAPIView): 
     permission_classes = [permissions.IsAuthenticated, HasPrivilege]
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['cliente', 'estado']
@@ -86,14 +85,14 @@ class CreditoListCreateView(generics.ListAPIView): # Cambiado de ListCreateAPIVi
     def get_queryset(self):
         return Credito.objects.select_related('cliente').prefetch_related('abonos').all().order_by('-fecha_otorgamiento', '-id')
 
-    # El método POST ya no es necesario, por lo que get_required_privilege se simplifica
+    
     def get_required_privilege(self, method):
         if method == 'GET':
             return 'creditos_ver'
         return None # No se permiten otros métodos
 
     def list(self, request, *args, **kwargs):
-        # ... (lógica de list sin cambios)
+        
         queryset = self.filter_queryset(self.get_queryset())
         creditos_a_serializar = list(queryset)
         for credito in creditos_a_serializar:
@@ -121,7 +120,6 @@ class CreditoRetrieveUpdateDestroyView(generics.RetrieveUpdateAPIView):
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
 
-# --- VISTA MODIFICADA ---
 class AbonoCreditoCreateView(generics.CreateAPIView):
     serializer_class = AbonoCreditoCreateSerializer
     # Tanto el cliente como el admin (con privilegio) pueden registrar un abono
@@ -143,7 +141,7 @@ class AbonoCreditoCreateView(generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         
-        # ✨ --- LÓGICA CLAVE ---
+        
         # Si el abono lo está creando un administrador, lo aprobamos de inmediato.
         if es_admin_con_privilegio and credito.cliente != request.user:
             try:
@@ -199,14 +197,14 @@ class AbonoCreditoCreateView(generics.CreateAPIView):
             return Response(CreditoSerializer(credito).data, status=status.HTTP_201_CREATED)
 
 
-# --- VISTA NUEVA ---
+
 class VerificarAbonoView(APIView):
     """
     Vista exclusiva para administradores con el privilegio de verificar abonos.
     Permite aprobar o rechazar un abono pendiente.
     """
     permission_classes = [permissions.IsAuthenticated, HasPrivilege]
-    required_privilege = 'creditos_verificar_abonos' # Necesitarás crear este privilegio en tu sistema
+    required_privilege = 'creditos_verificar_abonos' 
 
     def post(self, request, abono_id, *args, **kwargs):
         # Solo podemos verificar abonos que estén pendientes
@@ -228,7 +226,7 @@ class VerificarAbonoView(APIView):
                     if monto_abono > deuda_total_pre_abono:
                         return Response({"error": f"El monto del abono (${monto_abono:,.2f}) no puede ser mayor a la deuda total (${deuda_total_pre_abono:,.2f})."}, status=status.HTTP_400_BAD_REQUEST)
 
-                    # Esta es la lógica que movimos desde la vista de creación
+                    
                     abono_restante = monto_abono
                     intereses_cubiertos = min(abono_restante, credito.intereses_acumulados)
                     credito.intereses_acumulados -= intereses_cubiertos
@@ -262,7 +260,7 @@ class VerificarAbonoView(APIView):
             abono.save()
             
             logger.info(f"Abono #{abono.id} RECHAZADO por {request.user}. Motivo: {motivo}")
-            # Aquí podrías encolar una tarea para notificar al cliente por correo electrónico.
+            
             
             return Response(AbonoCreditoReadSerializer(abono).data, status=status.HTTP_200_OK)
         
@@ -311,7 +309,7 @@ class GenerarCreditoPDFView(APIView):
         story.append(resumen_table)
         story.append(Spacer(1, 24))
 
-        # --- MODIFICADO: Incluir estado del abono en el PDF ---
+        # --- Incluir estado del abono en el PDF ---
         abonos_verificados = credito.abonos.filter(estado='Verificado')
         if abonos_verificados.exists():
             story.append(Paragraph("Historial de Abonos Aplicados", styles['h2']))
@@ -355,17 +353,14 @@ class ClienteGenerarCreditoPDFView(APIView):
     renderer_classes = [BinaryPDFRenderer, JSONRenderer]
 
     def get(self, request, *args, **kwargs):
-        # ... (código sin cambios, similar a GenerarCreditoPDFView)
-        # Por brevedad, se omite pero puedes copiar la lógica de la vista de admin,
-        # asegurándote de que solo filtre por el crédito del cliente logueado.
+        
         cliente = request.user
         credito = get_object_or_404(
             Credito.objects.select_related('cliente').prefetch_related('abonos'), 
             cliente=cliente, 
             estado='Activo'
         )
-        # El resto de la generación del PDF es idéntico a GenerarCreditoPDFView
-        # ...
+     
         return Response(...) # Respuesta con el PDF
 
 class ClienteHistorialCreditosView(generics.ListAPIView):
@@ -407,7 +402,6 @@ class SolicitudCreditoDetailView(generics.RetrieveUpdateAPIView):
 
     def get_serializer_class(self):
         if self.request.method in ['PUT', 'PATCH']:
-            # ✨ Usamos el nuevo serializer para procesar la decisión
             return SolicitudDecisionSerializer
         return SolicitudCreditoReadSerializer
 
@@ -417,16 +411,15 @@ class SolicitudCreditoDetailView(generics.RetrieveUpdateAPIView):
         return None
 
     def perform_update(self, serializer):
-        # ✨ El serializer ahora también guarda el monto_aprobado en la instancia de la solicitud
         solicitud = serializer.save(fecha_decision=timezone.now())
         
         if solicitud.estado == 'Aprobada' and not solicitud.credito_generado:
             logger.info(f"Aprobando solicitud #{solicitud.id}. Intentando crear crédito...")
             
-            # ✨ LÓGICA CLAVE: Usamos `solicitud.monto_aprobado` en lugar de `monto_solicitado`
+            
             credito = Credito.objects.create(
                 cliente=solicitud.cliente,
-                cupo_aprobado=solicitud.monto_aprobado, # <- Cambio principal aquí
+                cupo_aprobado=solicitud.monto_aprobado,
                 plazo_dias=solicitud.plazo_dias_solicitado,
                 fecha_otorgamiento=timezone.localdate()
             )
@@ -436,7 +429,7 @@ class SolicitudCreditoDetailView(generics.RetrieveUpdateAPIView):
             
             logger.info(f"Crédito #{credito.id} creado con un cupo de ${credito.cupo_aprobado:,.2f} para la solicitud #{solicitud.id}.")
 
-    # --- MÉTODO AÑADIDO PARA CORREGIR EL ERROR ---
+    
     def update(self, request, *args, **kwargs):
         """
         Sobrescribimos el método update para asegurarnos de que la respuesta
