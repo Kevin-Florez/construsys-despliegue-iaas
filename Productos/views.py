@@ -14,36 +14,25 @@ from django.db.models import ProtectedError, Q, F
 from .models import CategoriaProducto, Producto
 from rest_framework.permissions import IsAuthenticated
 from .serializers import CategoriaProductoSerializer, ProductoSerializer, ProductoDashboardStockSerializer, MarcaSerializer
-# ✨ 1. Importamos la nueva clase de permiso # ✨ 1. ASEGÚRATE DE TENER ESTA IMPORTACIÓN
 from rest_framework.permissions import AllowAny
 from Roles_Permisos.permissions import HasPrivilege
 from rest_framework.pagination import PageNumberPagination
-# --- INICIO DE CAMBIOS ---
-# Importamos el serializer de bajas para la nueva acción
-# backend/Productos/views.py
-from Roles_Permisos.permissions import HasPrivilege, IsAdminOrReadOnly # ✨ 1. Importa la nueva clase
+from Roles_Permisos.permissions import HasPrivilege, IsAdminOrReadOnly 
 from rest_framework.permissions import IsAuthenticated
-# ... otras importaciones ...
 from Stock.serializers import BajaDeStockCreateSerializer
-# ...
-# --- FIN DE CAMBIOS ---
 from rest_framework.decorators import action
 
 
 class CatalogoPagination(PageNumberPagination):
-    page_size = 10  # Número de productos por página. Puedes ajustarlo.
+    page_size = 10  # Número de productos por página.
     page_size_query_param = 'page_size'
     max_page_size = 50
 
 
 class CatalogoPublicoView(generics.ListAPIView):
-    # Los permisos y el serializer se mantienen igual
     permission_classes = [permissions.AllowAny]
     serializer_class = ProductoSerializer
 
-    # ❗ INICIO DEL CAMBIO ❗
-    # Ya no definimos 'pagination_class' directamente.
-    # En su lugar, sobreescribimos el método que la obtiene.
     
     def get_pagination_class(self):
         """
@@ -58,7 +47,6 @@ class CatalogoPublicoView(generics.ListAPIView):
         # Si no viene el parámetro, usamos la paginación normal para el móvil.
         return CatalogoPagination
 
-    # ❗ FIN DEL CAMBIO ❗
 
     def get_queryset(self):
         """
@@ -124,12 +112,12 @@ class CatalogoClienteView(generics.ListAPIView):
     """
     permission_classes = [permissions.IsAuthenticated]
     def get(self, request, *args, **kwargs):
-        # --- INICIO DE CAMBIOS ---
+      
         productos_activos = Producto.objects.filter(
             Q(activo=True) & 
             Q(precio_venta__gt=0) & 
             (Q(categoria__activo=True) | Q(categoria__isnull=True)) &
-            (Q(marca__activo=True) | Q(marca__isnull=True)) # <-- Se añade esta línea
+            (Q(marca__activo=True) | Q(marca__isnull=True))
         ).select_related('categoria', 'marca').order_by('nombre')
 
 
@@ -145,11 +133,10 @@ class CatalogoClienteView(generics.ListAPIView):
 # --- VISTAS ADMINISTRATIVAS DE CATEGORÍAS ---
 
 class CategoriaProductoListCreateView(generics.ListCreateAPIView):
-    # queryset = CategoriaProducto.objects.all().order_by('nombre') # Puedes eliminar o comentar esta línea
     serializer_class = CategoriaProductoSerializer
     permission_classes = [permissions.IsAuthenticated, HasPrivilege]
 
-    # --- INICIO DE CAMBIOS ---
+    
     def get_queryset(self):
         """
         Este método ahora filtra las categorías. Si se envía el parámetro 
@@ -160,7 +147,6 @@ class CategoriaProductoListCreateView(generics.ListCreateAPIView):
         if activo_param and activo_param.lower() == 'true':
             queryset = queryset.filter(activo=True)
         return queryset.order_by('nombre')
-    # --- FIN DE CAMBIOS ---
 
     def get_required_privilege(self, method):
         if method == 'GET':
@@ -219,17 +205,16 @@ class ProductoRetrieveUpdateDestroyView(mixins.RetrieveModelMixin,
     queryset = Producto.objects.select_related('categoria', 'marca').all()
     serializer_class = ProductoSerializer
     
-    # This method dynamically provides the correct permission classes
+   
     def get_permissions(self):
         """
         Instantiates and returns the list of permissions that this view requires.
         """
-        # For read-only actions (GET), anyone is allowed.
-        if self.action in ['retrieve']: # 'retrieve' corresponds to GET for a single item
+        
+        if self.action in ['retrieve']: 
             return [permissions.AllowAny()]
         
-        # For write actions (update, delete), we require the user to be
-        # an admin with the specific privilege.
+        
         return [permissions.IsAuthenticated(), IsAdminOrReadOnly(), HasPrivilege()]
 
     def get_required_privilege(self, method):
@@ -237,7 +222,7 @@ class ProductoRetrieveUpdateDestroyView(mixins.RetrieveModelMixin,
             return 'productos_editar'
         if method == 'DELETE':
             return 'productos_eliminar'
-        # No privilege required for GET
+       
         return None
 
     def perform_destroy(self, instance):
@@ -285,11 +270,11 @@ class ProductosStockSummaryView(APIView):
     
 
 class MarcaListCreateView(generics.ListCreateAPIView):
-    # queryset = Marca.objects.all().order_by('nombre') # Puedes eliminar o comentar esta línea
+   
     serializer_class = MarcaSerializer
     permission_classes = [permissions.IsAuthenticated, HasPrivilege]
 
-    # --- INICIO DE CAMBIOS ---
+  
     def get_queryset(self):
         """
         Este método filtra las marcas. Si se envía el parámetro `?activo=true`,
@@ -300,7 +285,7 @@ class MarcaListCreateView(generics.ListCreateAPIView):
         if activo_param and activo_param.lower() == 'true':
             queryset = queryset.filter(activo=True)
         return queryset.order_by('nombre')
-    # --- FIN DE CAMBIOS ---
+  
 
     def get_required_privilege(self, method):
         if method == 'GET':
@@ -325,7 +310,6 @@ class MarcaRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
         
 
     def perform_destroy(self, instance):
-        # related_name="productos" en el modelo Producto
         if instance.productos.exists():
             raise ValidationError("Esta marca no puede ser eliminada porque tiene productos asociados.")
         instance.delete()
