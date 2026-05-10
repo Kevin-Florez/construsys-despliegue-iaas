@@ -7,7 +7,6 @@ import json
 import logging
 
 from django.utils import timezone
-# ✨ CORRECCIÓN 1: Importamos el modelo con su nuevo nombre
 from .models import Venta, DetalleVenta
 from Clientes.models import Cliente
 from Productos.models import Producto
@@ -16,24 +15,23 @@ from Devoluciones.serializers import DevolucionReadSerializer
 
 logger = logging.getLogger(__name__)
 
-# ✨ CORRECCIÓN 2: Renombramos el serializador y su Meta.model
 class DetalleVentaReadSerializer(serializers.ModelSerializer):
     # Usamos 'producto_nombre_historico' para asegurar que el nombre sea el del momento de la venta
     producto_nombre = serializers.CharField(source='producto_nombre_historico', read_only=True)
-    # ✨ --- INICIO DE CAMBIOS --- ✨
+    
     precio_final_unitario = serializers.DecimalField(
         source='precio_final_unitario_con_iva', 
         max_digits=12, 
         decimal_places=2, 
         read_only=True
     )
-    # ✨ --- FIN DE CAMBIOS --- ✨
+   
 
     class Meta:
         model = DetalleVenta
-        # ✨ --- INICIO DE CAMBIOS --- ✨
+        
         fields = ['id', 'producto_nombre', 'cantidad', 'precio_unitario_venta', 'iva_unitario', 'precio_final_unitario', 'costo_unitario_historico', 'subtotal']
-        # ✨ --- FIN DE CAMBIOS --- ✨
+        
 
 class VentaReadSerializer(serializers.ModelSerializer):
     cliente_info = serializers.SerializerMethodField()
@@ -42,8 +40,7 @@ class VentaReadSerializer(serializers.ModelSerializer):
     es_ajustable = serializers.BooleanField(read_only=True)
     devolucion = DevolucionReadSerializer(read_only=True)
 
-    # ✨ CORRECCIÓN CLAVE: Nos aseguramos de que los detalles se incluyan siempre
-    # El related_name en el modelo Venta es 'detalles', así que esto funcionará
+    # aseguramos de que los detalles se incluyan siempre
     detalles = DetalleVentaReadSerializer(many=True, read_only=True)
     
     estado_display = serializers.CharField(source='get_estado_display', read_only=True)
@@ -59,7 +56,7 @@ class VentaReadSerializer(serializers.ModelSerializer):
             'id', 'fecha', 'cliente', 'cliente_info', 
             'subtotal', 'iva', 'total', 'estado', 'estado_display', 
             'metodo_entrega', 'metodo_entrega_display', 'direccion_entrega',
-            'detalles', # Nos aseguramos de que 'detalles' esté en la lista de campos
+            'detalles', 
             'resumen_productos',
             'credito_usado', 'monto_cubierto_con_credito', 
             'monto_pago_adicional', 'metodo_pago_adicional', 
@@ -88,7 +85,7 @@ class VentaReadSerializer(serializers.ModelSerializer):
         return "Cliente no especificado"
 
     def get_resumen_productos(self, obj: Venta) -> str:
-        # ✨ CORRECCIÓN 5: Usamos obj.detalles.all() en lugar de obj.items.all()
+        
         items_list = [f"{item.producto_nombre_historico} (x{item.cantidad})" for item in obj.detalles.all()]
         if not items_list:
             return "No hay productos en esta venta."
@@ -160,7 +157,6 @@ class VentaCreateSerializer(serializers.ModelSerializer):
             precio_unitario = Decimal(item_data['precio_unitario_venta'])
             cantidad = item_data['cantidad']
             
-            # ✨ --- INICIO DE CAMBIOS --- ✨
             iva_unitario_calculado = precio_unitario * TASA_IVA
             
             # Creamos la instancia del detalle de venta incluyendo el IVA por unidad
@@ -171,7 +167,7 @@ class VentaCreateSerializer(serializers.ModelSerializer):
                 precio_unitario_venta=precio_unitario,
                 iva_unitario=iva_unitario_calculado # Guardamos el IVA unitario
             )
-            # ✨ --- FIN DE CAMBIOS --- ✨
+            
             calculated_subtotal += (cantidad * precio_unitario)
 
         venta.subtotal = calculated_subtotal
