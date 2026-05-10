@@ -4,7 +4,6 @@ from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError, PermissionDenied
 from .models import Rol, Permiso
 from .serializers import RolSerializer, PermisoSerializer
-# ✨ 1. Importamos la nueva clase de permiso
 from .permissions import HasPrivilege
 
 # Constantes para nombres de roles protegidos
