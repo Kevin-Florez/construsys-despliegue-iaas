@@ -15,12 +15,12 @@ class CustomJWTAuthentication(JWTAuthentication):
         """
         try:
             user_id = validated_token[settings.SIMPLE_JWT['USER_ID_CLAIM']]
-            # ✨ INICIO DE LA CORRECCIÓN: Leemos nuestro campo personalizado
+            #  Leemos nuestro campo personalizado
             user_type = validated_token.get('user_type') 
         except KeyError:
             raise InvalidToken('El token no contiene una identificación de usuario reconocible.')
 
-        # ✨ Buscamos en la tabla correcta basándonos en 'user_type'
+        #  Buscamos en la tabla correcta basándonos en 'user_type'
         if user_type == 'system_user':
             try:
                 user = User.objects.get(pk=user_id)
