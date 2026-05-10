@@ -6,9 +6,9 @@ from django.utils import timezone
 from .models import BajaDeStock, DevolucionAProveedor, ItemDevolucionAProveedor
 from Productos.models import Producto
 from Devoluciones.models import ItemDevuelto
-from Proveedores.models import Proveedor # Asegúrate de que esta importación exista
+from Proveedores.models import Proveedor 
 
-# --- Serializers para Bajas de Stock (Sin cambios) ---
+# --- Serializers para Bajas de Stock ---
 class BajaDeStockReadSerializer(serializers.ModelSerializer):
     producto_nombre = serializers.CharField(source='producto.nombre', read_only=True)
     motivo_display = serializers.CharField(source='get_motivo_display', read_only=True)
@@ -60,7 +60,7 @@ class GestionProveedorReadSerializer(serializers.ModelSerializer):
         model = DevolucionAProveedor
         fields = [
             'id', 'proveedor', 'proveedor_nombre',
-            'fecha_envio', 'fecha_recepcion_final',  # 👈 añadir aquí
+            'fecha_envio', 'fecha_recepcion_final',  
             'estado', 'estado_display', 'notas', 'items'
         ]
 
@@ -81,8 +81,8 @@ class ConfirmarRecepcionSerializer(serializers.Serializer):
 
 
     fecha_recepcion_final = serializers.DateField(required=True, write_only=True)
-    # --- INICIO DE CORRECCIÓN ---
-    # Lógica de actualización completamente reescrita para ser más robusta.
+    
+    # Lógica de actualización 
     @transaction.atomic
     def update(self, instance, validated_data):
         items_data = validated_data.get('items_recepcion')
@@ -128,9 +128,8 @@ class ConfirmarRecepcionSerializer(serializers.Serializer):
         todos_recibidos_completamente = all(item.cantidad_recibida >= item.cantidad_enviada for item in instance.items.all())
         instance.estado = 'COMPLETADA' if todos_recibidos_completamente else 'RECIBIDO_PARCIAL'
         
-        # ----> MODIFICA ESTA LÍNEA <----
-        # Antes: instance.fecha_recepcion_final = timezone.localdate()
-        # Ahora, usa la fecha que viene del frontend:
+    
+        # usa la fecha que viene del frontend:
         instance.fecha_recepcion_final = validated_data.get('fecha_recepcion_final')
 
         instance.save()
