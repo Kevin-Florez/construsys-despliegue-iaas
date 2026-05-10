@@ -22,7 +22,6 @@ class Proveedor(models.Model):
     )
     documento = models.CharField(max_length=30, unique=True, verbose_name="Número de documento")
     telefono = models.CharField(max_length=20, verbose_name="Teléfono")
-    # ✨ NUEVO CAMPO CORREO ✨
     correo = models.EmailField(max_length=254, blank=True, null=True, verbose_name="Correo Electrónico")
     direccion = models.CharField(max_length=255, verbose_name="Dirección")
     contacto = models.CharField(max_length=100, blank=True, null=True, verbose_name="Nombre del contacto")
