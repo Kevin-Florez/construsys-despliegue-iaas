@@ -2,13 +2,12 @@
 
 from rest_framework import serializers
 from decimal import Decimal
-# --- MODIFICADO: Importar el nuevo modelo ---
 from .models import Credito, AbonoCredito, SolicitudCredito
 from Clientes.models import Cliente
 
 
 class CreditoDashboardSerializer(serializers.ModelSerializer):
-    # ... (código sin cambios)
+    
     cliente_nombre_completo = serializers.CharField(source='cliente.__str__', read_only=True)
     estado_display = serializers.CharField(source='get_estado_display', read_only=True)
     monto_otorgado = serializers.DecimalField(source='cupo_aprobado', max_digits=12, decimal_places=2, read_only=True)
@@ -18,7 +17,7 @@ class CreditoDashboardSerializer(serializers.ModelSerializer):
 
 
 class AbonoCreditoReadSerializer(serializers.ModelSerializer):
-    # ... (código sin cambios)
+    
     comprobante_url = serializers.FileField(source='comprobante', read_only=True, use_url=True)
     estado_display = serializers.CharField(source='get_estado_display', read_only=True)
     class Meta:
@@ -30,7 +29,7 @@ class AbonoCreditoReadSerializer(serializers.ModelSerializer):
 
 
 class AbonoCreditoCreateSerializer(serializers.ModelSerializer):
-    # ... (código sin cambios)
+    
     class Meta:
         model = AbonoCredito
         fields = ['monto', 'fecha_abono', 'metodo_pago', 'comprobante']
@@ -42,7 +41,7 @@ class AbonoCreditoCreateSerializer(serializers.ModelSerializer):
 
 
 class CreditoSerializer(serializers.ModelSerializer):
-    # ... (código sin cambios)
+    
     cliente_info = serializers.CharField(source='get_cliente_info_display', read_only=True)
     estado_display = serializers.CharField(source='get_estado_display', read_only=True)
     deuda_del_cupo = serializers.DecimalField(max_digits=12, decimal_places=2, read_only=True)
@@ -102,7 +101,6 @@ class SolicitudCreditoReadSerializer(serializers.ModelSerializer):
         model = SolicitudCredito
         fields = [
             'id', 'cliente', 'cliente_info', 'monto_solicitado', 
-            # ✨ Se añade el nuevo campo a la respuesta
             'monto_aprobado',
             'plazo_dias_solicitado',
             'estado', 'estado_display', 'fecha_solicitud', 'fecha_decision', 'motivo_decision',
@@ -110,14 +108,13 @@ class SolicitudCreditoReadSerializer(serializers.ModelSerializer):
         ]
 
 
-# --- SERIALIZER MODIFICADO Y RENOMBRADO ---
-# Renombrado de SolicitudUpdateStatusSerializer a SolicitudDecisionSerializer para ser más claro.
+
 class SolicitudDecisionSerializer(serializers.ModelSerializer):
     """
     Serializer para que el administrador apruebe o rechace una solicitud,
     permitiendo especificar un monto de aprobación.
     """
-    # ✨ Se añade el campo para recibir el monto aprobado desde el frontend.
+    # Se añade el campo para recibir el monto aprobado desde el frontend.
     monto_aprobado = serializers.DecimalField(
         max_digits=12, 
         decimal_places=2, 
@@ -136,7 +133,7 @@ class SolicitudDecisionSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("La acción solo puede ser 'Aprobada' o 'Rechazada'.")
         return value
 
-    # ✨ Se añade validación cruzada de campos.
+    # Se añade validación cruzada de campos.
     def validate(self, data):
         """
         Valida que si el estado es 'Aprobada', se proporcione un monto_aprobado.
@@ -150,5 +147,3 @@ class SolicitudDecisionSerializer(serializers.ModelSerializer):
             })
         
         return data
-
-# --- FIN DE NUEVOS SERIALIZERS ---
