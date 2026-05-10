@@ -8,11 +8,10 @@ class ProveedorSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'nombre', 'tipo_documento', 'documento', 'telefono',
             'correo', 'direccion', 'contacto', 'estado', 'fecha_registro',
-            'es_empresa'  # <--- AÑADE ESTE CAMPO AL FINAL
+            'es_empresa'  
         ]
         read_only_fields = ['id', 'fecha_registro']
 
-    # ✨ Opcional: Añadir validación para el correo ✨
 def validate_correo(self, value):
          if value and Proveedor.objects.filter(correo=value).exists():
               #Para actualizaciones, excluir el registro actual
