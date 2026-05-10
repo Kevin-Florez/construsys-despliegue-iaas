@@ -14,10 +14,9 @@ from .serializers import (
 )
 
 from Clientes.models import Cliente
-from Ventas.models import Venta # Asumiendo que tienes un app 'Ventas' con un modelo 'Venta'
+from Ventas.models import Venta 
 from Compras.models import Compra
 from Clientes.serializers import ClienteProfileSerializer
-# ✨ 1. Importamos la nueva clase de permiso
 from Roles_Permisos.permissions import HasPrivilege
 
 User = get_user_model()
@@ -28,7 +27,6 @@ class UsuarioListCreateView(generics.ListCreateAPIView):
     Requiere privilegios específicos para ver o crear.
     """
     queryset = User.objects.all().order_by('first_name', 'last_name')
-    # ✨ 2. Reemplazamos el sistema de permisos
     permission_classes = [permissions.IsAuthenticated, HasPrivilege]
 
     def get_serializer_class(self):
@@ -36,7 +34,7 @@ class UsuarioListCreateView(generics.ListCreateAPIView):
             return UsuarioCreateSerializer
         return UsuarioSerializer
         
-    # ✨ 3. Definimos los privilegios para cada acción (GET vs POST)
+    # Definimos los privilegios para cada acción (GET vs POST)
     def get_required_privilege(self, method):
         if method == 'GET':
             return 'usuarios_ver'
@@ -50,7 +48,7 @@ class UsuarioRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     Requiere privilegios específicos para cada acción.
     """
     queryset = User.objects.all()
-    # ✨ 2. Reemplazamos el sistema de permisos
+    
     permission_classes = [permissions.IsAuthenticated, HasPrivilege]
 
     def get_serializer_class(self):
@@ -58,22 +56,20 @@ class UsuarioRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
             return UsuarioUpdateSerializer
         return UsuarioSerializer
 
-    # ✨ 3. Definimos los privilegios para cada acción
+    # Definimos los privilegios para cada acción
     def get_required_privilege(self, method):
         if method == 'GET':
             return 'usuarios_ver'
         if method in ['PUT', 'PATCH']:
             return 'usuarios_editar'
         if method == 'DELETE':
-            # Nota: Django REST Framework no siempre expone DELETE en esta vista,
-            # pero si lo haces, este sería el permiso.
-            return 'usuarios_eliminar' # Asumiendo que existe un privilegio 'eliminar'
+            return 'usuarios_eliminar' 
         return None
         
     def perform_update(self, serializer):
         instance = self.get_object()
         
-        # Lógica para prevenir la autodesactivación (sin cambios)
+        # Lógica para prevenir la autodesactivación 
         if 'activo' in self.request.data and self.request.data.get('activo') is False:
             if instance.pk == self.request.user.pk:
                 raise PermissionDenied(
@@ -83,30 +79,13 @@ class UsuarioRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
         serializer.save()
 
     def perform_destroy(self, instance):
-        # 1. Validaciones de autoprotección (ya las tenías y están bien)
+        # 1. Validaciones de autoprotección 
         if instance.pk == self.request.user.pk:
             raise PermissionDenied(detail="No puedes eliminar tu propia cuenta.")
         
         if instance.is_superuser:
             raise PermissionDenied(detail="Las cuentas de superusuario no pueden ser eliminadas.")
             
-        # 2. ✨ NUEVA VALIDACIÓN DE INTEGRIDAD DE DATOS ✨
-        # Comprueba si el usuario tiene registros asociados en otros modelos.
-        # Añade aquí todos los modelos importantes donde un usuario puede estar referenciado.
-        
-        # Ejemplo con Ventas (ajusta 'usuario_creador' al nombre real de tu campo ForeignKey)
-        #if Venta.objects.filter(usuario_creador=instance).exists():
-            #raise ValidationError("Este usuario no puede ser eliminado porque tiene ventas asociadas. Por favor, desactívelo en su lugar.")
-
-        # Ejemplo con Compras
-        #if Compra.objects.filter(usuario_registra=instance).exists():
-            #raise ValidationError("Este usuario no puede ser eliminado porque tiene compras asociadas. Por favor, desactívelo en su lugar.")
-
-        # Puedes añadir más comprobaciones aquí...
-        # if Producto.objects.filter(usuario=instance).exists():
-        #     raise ValidationError(...)
-
-        # 3. Si pasa todas las validaciones, procede a eliminar.
         instance.delete()
 
 class CambiarContrasenaView(APIView):
