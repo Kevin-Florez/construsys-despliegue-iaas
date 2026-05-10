@@ -4,7 +4,7 @@ Django settings for backend_api project.
 # ... (resto de tus comentarios y configuraciones iniciales) ...
 """
 from dotenv import load_dotenv
-import os # <<< --- AÑADE ESTA IMPORTACIÓN SI USAS os.path.join más abajo
+import os 
 
 
 
@@ -13,7 +13,7 @@ load_dotenv()
 
 from pathlib import Path
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
@@ -58,13 +58,9 @@ AWS_QUERYSTRING_AUTH = False
 print("✅ DEFAULT_FILE_STORAGE configurado para usar S3Boto3Storage.")
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
-# SECURITY WARNING: don't run with debug turned on in production!
+
 DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
 # backend_api/settings.py
@@ -111,7 +107,6 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'authentication.jwt_auth.CustomJWTAuthentication',
     ],
-    # AÑADE ESTO:
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
@@ -150,11 +145,9 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-# Para desarrollo está bien, en producción sé más restrictivo
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173", # <<< ---  puerto de tu React App
-    # "http://localhost:3000", # Si usaras el puerto 3000
+    "http://localhost:5173", # <<< ---  puerto de React App
 ]
 
 ROOT_URLCONF = 'backend_api.urls'
@@ -222,8 +215,7 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 MEDIA_URL = '/media/'
 
-# Define la ruta en el disco duro donde se guardarán los archivos subidos.
-#MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+#  ruta en el disco duro donde se guardarán los archivos subidos.
 
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -238,12 +230,7 @@ TASA_IVA = 19.0
 
 CORS_ALLOW_ALL_ORIGINS = True 
 
-# backend_api/settings.py (reemplaza tu bloque de Supabase al final del archivo)
 
-
-
-
-# settings.py (al final de todo el archivo)
 
 print("--- VERIFICACIÓN DE CONFIGURACIÓN ---")
 print(f"MODO DEBUG: {DEBUG}")
