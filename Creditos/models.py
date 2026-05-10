@@ -6,9 +6,7 @@ from datetime import timedelta
 from decimal import Decimal
 import logging
 
-# Se eliminan las importaciones directas de modelos de otras apps
-# from Clientes.models import Cliente
-# from Configuracion.models import ConfiguracionSistema
+
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +31,7 @@ class Credito(models.Model):
     fecha_creacion_registro = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion_registro = models.DateTimeField(auto_now=True)
     
-    # ... (todos los @property y métodos se mantienen igual)
+    
     @property
     def get_cliente_info_display(self):
         if self.cliente:
