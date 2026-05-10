@@ -17,9 +17,9 @@ class ImagenProductoSerializer(serializers.ModelSerializer):
 class MarcaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Marca
-        # --- INICIO DE CAMBIOS ---
+       
         fields = ['id', 'nombre', 'activo']
-        # --- FIN DE CAMBIOS ---
+        
 
 class ProductoSerializer(serializers.ModelSerializer):
     categoria = CategoriaProductoSerializer(read_only=True)
@@ -47,21 +47,19 @@ class ProductoSerializer(serializers.ModelSerializer):
             'descripcion', 'imagen_url', 
             'peso', 'dimensiones', 'material', 'otros_detalles',
             'imagenes', 'imagenes_write',
-            
-            # --- INICIO DE CAMBIOS ---
             'precio_venta', 
             'ultimo_margen_aplicado',
-            # --- FIN DE CAMBIOS ---
+            
             
             'ultimo_costo_compra',
             'stock_actual', 'stock_minimo', 'stock_maximo', 'activo',
             'categoria', 'categoria_id',
             'marca', 'marca_id'
         ]
-        # --- INICIO DE CAMBIOS ---
-        # El precio de venta ahora es de solo lectura directa, se calcula via margen.
+        
+        # El precio de venta es de solo lectura directa, se calcula via margen.
         read_only_fields = ['id', 'ultimo_costo_compra', 'stock_actual', 'precio_venta']
-        # --- FIN DE CAMBIOS ---
+        
 
     def create(self, validated_data):
         # Al crear, no se establece precio de venta ni margen, empiezan en 0 o nulo.
@@ -78,7 +76,7 @@ class ProductoSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         imagenes_urls = validated_data.pop('imagenes_write', None)
         
-        # --- INICIO DE LÓGICA DE PRECIOS ---
+        # --- LÓGICA DE PRECIOS ---
         # Si se envía un nuevo margen, calculamos el nuevo precio de venta.
         if 'ultimo_margen_aplicado' in validated_data:
             nuevo_margen = validated_data.get('ultimo_margen_aplicado')
@@ -87,7 +85,7 @@ class ProductoSerializer(serializers.ModelSerializer):
                 # Formula: Precio Venta = Costo * (1 + Margen / 100)
                 nuevo_precio = costo * (Decimal('1') + (Decimal(nuevo_margen) / Decimal('100')))
                 instance.precio_venta = nuevo_precio
-        # --- FIN DE LÓGICA DE PRECIOS ---
+        
 
         # Actualiza el resto de los campos
         instance = super().update(instance, validated_data)
