@@ -5,7 +5,7 @@ from . import views
 from .views import ClienteHistorialCreditosView
 
 urlpatterns = [
-    # --- RUTAS DE CLIENTES (sin cambios) ---
+    # --- RUTAS DE CLIENTES 
     path('mi-credito/', views.ClienteCreditoDetailView.as_view(), name='cliente-credito-detail'),
     path('mi-credito/pdf/', views.ClienteGenerarCreditoPDFView.as_view(), name='cliente-credito-pdf'),
     path('mi-historial/', ClienteHistorialCreditosView.as_view(), name='cliente-credito-historial'),
