@@ -4,10 +4,7 @@ from rest_framework import generics, permissions, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import Devolucion
-# --- INICIO DE CAMBIOS ---
-# Se importa el modelo directamente para poder crearlo
 from Stock.models import DevolucionAProveedor, ItemDevolucionAProveedor
-# --- FIN DE CAMBIOS ---
 from .serializers import DevolucionCreateSerializer, DevolucionReadSerializer
 from Stock.serializers import ConfirmarRecepcionSerializer
 from Ventas.models import Venta
@@ -24,7 +21,6 @@ class DatosVentaParaDevolucionView(generics.RetrieveAPIView):
     required_privilege = "ventas_devolucion"
 
 class DevolucionListCreateView(generics.ListCreateAPIView):
-    # --- INICIO DE CORRECCIÓN ---
     # Se añade el ordenamiento por fecha de devolución (más recientes primero)
     # y luego por ID como segundo criterio de desempate.
     queryset = Devolucion.objects.select_related(
@@ -34,7 +30,7 @@ class DevolucionListCreateView(generics.ListCreateAPIView):
         'gestion_proveedor__items__producto_original',
         'gestion_proveedor__items__producto_recibido'
     ).order_by('-fecha_devolucion', '-id')
-    # --- FIN DE CORRECCIÓN ---
+    
     permission_classes = [permissions.IsAuthenticated, HasPrivilege]
 
     def get_serializer_class(self):
@@ -71,15 +67,14 @@ class EnviarDevolucionAProveedorView(APIView):
         
         gestion = DevolucionAProveedor.objects.create(devolucion_origen=devolucion, proveedor=proveedor)
         for item in items_defectuosos:
-            # --- INICIO DE CORRECCIÓN ---
-            # Se crea el objeto 'ItemDevolucionAProveedor' directamente, que es la forma correcta.
+            
             ItemDevolucionAProveedor.objects.create(
                 gestion_proveedor=gestion,
                 item_devuelto_origen=item,
                 producto_original=item.producto,
                 cantidad_enviada=item.cantidad
             )
-            # --- FIN DE CORRECCIÓN ---
+           
             item.devuelto_a_proveedor = True
             item.save(update_fields=['devuelto_a_proveedor'])
             
