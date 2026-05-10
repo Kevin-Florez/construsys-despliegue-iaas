@@ -7,7 +7,7 @@ from django.db import transaction
 class Command(BaseCommand):
     help = 'Crea y sincroniza los permisos granulares (privilegios) para cada módulo del sistema.'
 
-    # ✨ --- MAPA CENTRAL DE PRIVILEGIOS --- ✨
+    # --- MAPA CENTRAL DE PRIVILEGIOS --- 
     PERMISSIONS_MAP = {
         'Dashboard': ['ver'],
         'Ventas': ['ver', 'crear', 'editar', 'anular', 'devolucion'],
@@ -23,18 +23,13 @@ class Command(BaseCommand):
         'Proveedores': ['ver', 'crear', 'editar', 'eliminar'],
         'Creditos': ['ver', 'editar', 'anular', 'abonar', 'verificar_abonos'],
         'Solicitudes': ['ver', 'crear', 'gestionar'],
-        
-        # --- INICIO DE CAMBIOS ---
-        # Se renombra 'Inventario' a 'Stock' y se ajustan privilegios
         'Stock': ['ver_bajas', 'registrar_baja'],
         
-        # Se añaden privilegios para el nuevo módulo unificado de Devoluciones
         'Devoluciones': [
             'ver_devolucion_proveedor', 
             'crear_devolucion_proveedor', 
             'editar_devolucion_proveedor'
         ]
-        # --- FIN DE CAMBIOS ---
     }
 
     @transaction.atomic
