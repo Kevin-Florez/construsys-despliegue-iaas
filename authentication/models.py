@@ -4,12 +4,11 @@ import uuid
 
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-# Ya no necesitamos settings porque no usaremos AUTH_USER_MODEL directamente
 
 class PasswordResetToken(models.Model):
     
 
-    # Añadimos los campos para la relación genérica
+    # campos para la relación genérica
     # Esto nos permitirá asociar el token con un Cliente o un CustomUser
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
