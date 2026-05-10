@@ -7,10 +7,6 @@ from decimal import Decimal
 from datetime import timedelta
 import logging
 
-# Se eliminan las importaciones directas de modelos de otras apps
-# from Clientes.models import Cliente
-# from Productos.models import Producto
-# from Creditos.models import Credito
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +37,6 @@ class Venta(models.Model):
     
     pedido_origen = models.OneToOneField('Pedidos.Pedido', on_delete=models.SET_NULL, null=True, blank=True, related_name='venta', verbose_name="Pedido de Origen")
 
-    # ... (todos los @property y métodos se mantienen igual, con importaciones locales)
     @property
     def fecha_limite_ajuste(self):
         return self.fecha + timedelta(days=15)
@@ -142,7 +137,7 @@ class DetalleVenta(models.Model):
     def precio_final_unitario_con_iva(self):
         """Devuelve el precio de una sola unidad incluyendo su IVA."""
         return self.precio_unitario_venta + self.iva_unitario
-    # ✨ --- FIN DE CAMBIOS --- ✨
+    
 
     def save(self, *args, **kwargs):
         self.subtotal = Decimal(self.cantidad) * self.precio_unitario_venta
