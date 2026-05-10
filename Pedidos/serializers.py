@@ -49,11 +49,10 @@ class PedidoSerializer(serializers.ModelSerializer):
         required=False
     )
     
-    # ✨ --- INICIO DEL CAMBIO ---
-    # Añadimos un campo para saber si se usó crédito.
+    # campo para saber si se usó crédito.
     # Es un campo de solo lectura que se calcula en el momento.
     fue_pagado_con_credito = serializers.SerializerMethodField()
-    # ✨ --- FIN DEL CAMBIO ---
+ 
     
     credito_usado_id = serializers.PrimaryKeyRelatedField(
         queryset=Credito.objects.all(),
@@ -70,9 +69,7 @@ class PedidoSerializer(serializers.ModelSerializer):
             'subtotal', 'iva', 'total', 
             'estado', 'metodo_entrega', 'nombre_receptor', 'telefono_receptor', 
             'direccion_entrega', 'credito_usado_id', 'monto_usado_credito',
-            # ✨ --- INICIO DEL CAMBIO ---
-            'fue_pagado_con_credito', # Añadimos el nuevo campo a la lista
-            # ✨ --- FIN DEL CAMBIO ---
+            'fue_pagado_con_credito', 
             'productos', 'detalles', 'token_seguimiento',
             'email_invitado',
             'tipo_documento_invitado',
@@ -84,12 +81,10 @@ class PedidoSerializer(serializers.ModelSerializer):
             'id', 'fecha_creacion', 'subtotal', 'iva', 'total', 
             'token_seguimiento', 'detalles', 'cliente', 'comprobantes',
             'monto_pagado_verificado', 'monto_usado_credito',
-            # ✨ --- INICIO DEL CAMBIO ---
-            'fue_pagado_con_credito' # Lo marcamos como solo lectura
-            # ✨ --- FIN DEL CAMBIO ---
+            'fue_pagado_con_credito' 
+            
         ]
     
-    # ✨ --- INICIO DEL CAMBIO ---
     # Esta función define el valor para el campo 'fue_pagado_con_credito'.
     # Django REST Framework la llamará automáticamente para cada pedido.
     def get_fue_pagado_con_credito(self, obj):
@@ -164,7 +159,7 @@ class PedidoSerializer(serializers.ModelSerializer):
             monto_usado_credito = total_pedido
             estado_inicial = 'confirmado'
             
-        # ✨ CORRECCIÓN: La creación del pedido ocurre aquí, fuera de la condición del crédito
+        # La creación del pedido ocurre aquí, fuera de la condición del crédito
         pedido = Pedido.objects.create(
             subtotal=subtotal_pedido,
             iva=iva_pedido,
@@ -192,7 +187,7 @@ class PedidoSerializer(serializers.ModelSerializer):
             pedido.estado = 'en_verificacion'
             pedido.save(update_fields=['estado'])
         
-        # ✨ CORRECCIÓN: Se aplica a CUALQUIER usuario (logueado o invitado) que no pague con crédito ni suba comprobante
+        #  Se aplica a CUALQUIER usuario (logueado o invitado) que no pague con crédito ni suba comprobante
         elif not credito_usado:
             pedido.estado = 'pendiente_pago_temporal'
             pedido.fecha_limite_pago = timezone.now() + timedelta(minutes=60)
@@ -204,7 +199,7 @@ class PedidoSerializer(serializers.ModelSerializer):
         enviar_correo_confirmacion_pedido(pedido)
         return pedido
 
-# --- Serializer de invitado (con pequeños cambios) ---
+# --- Serializer de invitado ---
 class GuestPedidoStatusSerializer(serializers.ModelSerializer):
     detalles = DetallePedidoSerializer(many=True, read_only=True)
     comprobantes = ComprobantePagoSerializer(many=True, read_only=True)
@@ -212,7 +207,7 @@ class GuestPedidoStatusSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Pedido
-        # 👇 2. Reemplaza 'email_invitado' por 'email_contacto'
+        
         fields = [
             'id', 'fecha_creacion', 'subtotal', 'iva', 'total', 'estado', 'metodo_entrega',
             'nombre_receptor', 'detalles', 'email_contacto', 'comprobantes', 'token_seguimiento',
@@ -220,7 +215,7 @@ class GuestPedidoStatusSerializer(serializers.ModelSerializer):
             'monto_pagado_verificado', 'monto_usado_credito'
         ]
 
-    # 👇 3. Define la lógica para obtener el email
+    #  Define la lógica para obtener el email
     def get_email_contacto(self, obj):
         if obj.cliente and obj.cliente.correo:
             return obj.cliente.correo
