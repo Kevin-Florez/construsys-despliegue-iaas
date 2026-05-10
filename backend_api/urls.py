@@ -5,10 +5,8 @@ from django.urls import path, include
 
 from .views import ContactoView
 
-# --- ✨ IMPORTACIONES PARA MEDIA FILES ✨ ---
 from django.conf import settings
 from django.conf.urls.static import static
-# --- ✨ FIN IMPORTACIONES ✨ ---
 from authentication.views import ProfileView, CheckDocumentoView
 from Usuarios.views import CambiarContrasenaView
 
@@ -20,7 +18,6 @@ urlpatterns = [
     # --- Inclusiones de URLs de las Apps ---
     path('api/auth/', include('authentication.urls')),
     path('api/auth/check-documento/', CheckDocumentoView.as_view(), name='check-documento'),
-    # Rutas que ya funcionaban bien
     path('api/clientes/', include('Clientes.urls')),
     path('api/cotizaciones/', include('Cotizaciones.urls')),
     path('api/roles-permisos/', include('Roles_Permisos.urls')),
