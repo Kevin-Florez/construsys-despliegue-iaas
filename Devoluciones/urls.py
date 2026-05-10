@@ -3,7 +3,7 @@
 from django.urls import path
 from .views import (
     DatosVentaParaDevolucionView,
-    DevolucionListCreateView, # Vista unificada
+    DevolucionListCreateView,
     EnviarDevolucionAProveedorView,
     ConfirmarRecepcionProveedorView
 )
@@ -11,8 +11,7 @@ from .views import (
 urlpatterns = [
     path('venta-original/<int:pk>/', DatosVentaParaDevolucionView.as_view(), name='devolucion-datos-venta'),
     
-    # --- RUTA PRINCIPAL ---
-    # Ahora esta URL acepta GET (para listar) y POST (para crear)
+    #esta URL acepta GET (para listar) y POST (para crear)
     path('', DevolucionListCreateView.as_view(), name='devolucion-list-create'),
     
     # --- ACCIONES ---
