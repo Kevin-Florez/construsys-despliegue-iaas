@@ -9,10 +9,6 @@ from django.db.models import Q
 from django.core.exceptions import ValidationError
 from datetime import timedelta
 
-# Se eliminan las importaciones directas de modelos de otras apps
-# from Clientes.models import Cliente
-# from Productos.models import Producto
-# from Creditos.models import Credito
 
 logger = logging.getLogger(__name__)
 
@@ -65,7 +61,7 @@ class Pedido(models.Model):
     
     es_carrito_activo = models.BooleanField(default=False, verbose_name="¿Es carrito activo?")
     
-    # ... (todos los métodos se mantienen igual, pero las importaciones necesarias se mueven dentro de ellos)
+    
     @transaction.atomic
     def descontar_stock(self):
         logger.info(f"Iniciando descuento de stock para el Pedido #{self.id}.")
