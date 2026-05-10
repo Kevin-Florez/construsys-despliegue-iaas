@@ -19,7 +19,7 @@ from .serializers import PedidoSerializer, GuestPedidoStatusSerializer, Comproba
 from Roles_Permisos.permissions import HasPrivilege
 from django.contrib.auth import get_user_model
 from .emails import enviar_correo_actualizacion_estado
-from rest_framework.filters import SearchFilter, OrderingFilter # Asegúrate de importar OrderingFilter si quieres ordenar
+from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend 
 
 User = get_user_model()
@@ -53,7 +53,7 @@ class PedidoListCreateView(generics.ListCreateAPIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 class GuestPedidoStatusView(generics.RetrieveAPIView):
-    # 👇 Añade .select_related('cliente') a tu queryset
+    
     queryset = Pedido.objects.all().select_related('cliente').prefetch_related('detalles__producto', 'comprobantes')
     serializer_class = GuestPedidoStatusSerializer
     permission_classes = [permissions.AllowAny]
@@ -192,7 +192,7 @@ class AdminPedidoDetailView(generics.RetrieveUpdateAPIView):
         return Response(serializer.data)
 
 class AgregarComprobanteView(generics.CreateAPIView):
-    serializer_class = ComprobantePagoSerializer  # Asumiendo que quieres el detalle completo del pedido
+    serializer_class = ComprobantePagoSerializer 
     permission_classes = [permissions.AllowAny]
 
     def perform_create(self, serializer):
@@ -350,7 +350,7 @@ class CarritoActivoView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
-        # ✨ CORRECCIÓN: Usamos el ID de la instancia de CustomUser para buscar el Cliente
+        #Usamos el ID de la instancia de CustomUser para buscar el Cliente
         cliente = ModeloCliente.objects.filter(id=request.user.id).first()
         
         if not cliente:
@@ -378,5 +378,4 @@ class PedidoDetailView(generics.RetrieveAPIView):
         Esta función es la clave de la seguridad: asegura que un usuario
         solo pueda ver los pedidos que le pertenecen.
         """
-        # Asumiendo que tu modelo Pedido tiene una relación ForeignKey llamada 'cliente' con el modelo User
         return self.request.user.pedidos.all()
