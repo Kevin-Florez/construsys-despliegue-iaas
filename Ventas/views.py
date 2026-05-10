@@ -15,7 +15,7 @@ from decimal import Decimal
 import logging
 from datetime import datetime, timedelta
 import io
-from datetime import datetime, timedelta, date # ✨ ASEGÚRATE DE QUE 'date' ESTÉ AQUÍ
+from datetime import datetime, timedelta, date
 from rest_framework.permissions import IsAdminUser
 
 # Imports de ReportLab para PDF
@@ -68,7 +68,7 @@ class ResumenGeneralDashboardView(APIView):
         ventas_hoy_total = ventas_base.filter(fecha=hoy, estado='Completada').aggregate(total=Sum('total', default=Decimal('0.00')))['total']
         ventas_periodo_total = ventas_base.filter(fecha__range=[fecha_inicio, fecha_fin], estado='Completada').aggregate(total=Sum('total', default=Decimal('0.00')))['total']
         
-        # b) Datos de Créditos (sin cambios)
+        # b) Datos de Créditos
         creditos_activos_qs = Credito.objects.filter(estado='Activo')
         cartera_total_agg = creditos_activos_qs.aggregate(
             total_cartera=Sum(F('deuda_del_cupo') + F('intereses_acumulados'), default=Decimal('0.00'))
@@ -82,7 +82,7 @@ class ResumenGeneralDashboardView(APIView):
             )
         ).filter(vencimiento_calculado__lt=hoy).count()
 
-        # c) Datos de Productos para Reponer (sin cambios)
+        # c) Datos de Productos para Reponer 
         productos_para_reponer_qs = Producto.objects.filter(activo=True, stock_actual__lte=F('stock_minimo')).order_by('stock_actual')[:10]
         
         # d) Ranking de Productos (Ventas + Pedidos)
@@ -113,7 +113,7 @@ class ResumenGeneralDashboardView(APIView):
         productos_mas_vendidos = ranking_ordenado[:5]
         productos_menos_vendidos = sorted(ranking_productos, key=lambda x: x['unidades_vendidas'])[:5]
 
-        # e) Tendencia de Ventas (sin cambios)
+        # e) Tendencia de Ventas
         delta_dias = (fecha_fin - fecha_inicio).days
         if delta_dias <= 45:
             trunc_kind, date_format = TruncDay('fecha'), "%d %b"
@@ -125,7 +125,7 @@ class ResumenGeneralDashboardView(APIView):
         tendencia_ventas_qs = ventas_base.filter(fecha__range=[fecha_inicio, fecha_fin], estado='Completada').annotate(periodo=trunc_kind).values('periodo').annotate(total_ventas=Sum('total')).order_by('periodo')
         tendencia_ventas = [{'name': item['periodo'].strftime(date_format), 'ventas': item['total_ventas'] or 0} for item in tendencia_ventas_qs]
 
-        # Ensamblaje de la Respuesta (sin cambios)
+        # Ensamblaje de la Respuesta
         data = {
             "stats_generales": {
                 "ventas_hoy": ventas_hoy_total,
@@ -142,7 +142,7 @@ class ResumenGeneralDashboardView(APIView):
         }
         return Response(data)
 
-# --- VISTAS DEL MÓDULO DE VENTAS (SIN CAMBIOS) ---
+# --- VISTAS DEL MÓDULO DE VENTAS ---
 
 class VentaListCreateView(generics.ListCreateAPIView):
     queryset = Venta.objects.select_related('cliente', 'devolucion').prefetch_related('detalles__producto').all().order_by('-id')
@@ -168,11 +168,11 @@ class VentaListCreateView(generics.ListCreateAPIView):
 
 class VentaRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Venta.objects.select_related(
-    'cliente', 'credito_usado', 'devolucion' # <-- Corregido
+    'cliente', 'credito_usado', 'devolucion' 
 ).prefetch_related(
     'detalles__producto', 
-    'devolucion__items_devueltos__producto', # <-- Corregido
-    'devolucion__items_cambio__producto'      # <-- Corregido
+    'devolucion__items_devueltos__producto', 
+    'devolucion__items_cambio__producto'      
 ).all()
     
     permission_classes = [permissions.IsAuthenticated, HasPrivilege]
@@ -304,7 +304,7 @@ class GenerarVentaPDFView(APIView):
         pago_resumen_str = VentaReadSerializer().get_resumen_pago(venta)
         story.append(Paragraph(f"<b>Forma de Pago:</b> {pago_resumen_str}", style_normal))
 
-        # --- Sección de Devolución (MEJORADA) ---
+        # --- Sección de Devolución ---
         if tiene_devolucion:
             devolucion = venta.devolucion
             story.append(Spacer(1, 0.3 * inch))
@@ -414,7 +414,7 @@ class MobileDashboardView(APIView):
     para el dashboard de la aplicación móvil.
     """
     permission_classes = [permissions.IsAuthenticated, HasPrivilege]
-    required_privilege = "dashboard_ver" # Asegúrate de que los admins tengan este privilegio
+    required_privilege = "dashboard_ver" 
 
     def get(self, request):
         hoy = timezone.now().date()
@@ -426,7 +426,7 @@ class MobileDashboardView(APIView):
             estado='Completada'
         ).aggregate(total=Sum('total'))['total'] or Decimal('0.00')
 
-        # ✨ NUEVO: Cálculo de ventas de los últimos 30 días
+        #  Cálculo de ventas de los últimos 30 días
         ventas_30_dias = Venta.objects.filter(
             fecha__range=[hace_30_dias, hoy],
             estado='Completada'
@@ -435,14 +435,14 @@ class MobileDashboardView(APIView):
         # 2. Pedidos por Verificar (estado 'en_verificacion')
         pedidos_por_verificar = Pedido.objects.filter(estado='en_verificacion').count()
         
-        # 3. Productos con bajo stock (sin cambios, ya estaba bien)
+        # 3. Productos con bajo stock
         productos_bajo_stock = Producto.objects.filter(
             activo=True, 
             stock_actual__lte=F('stock_minimo')
         ).count()
 
-        # 4. ✨ ENSAMBLAJE DE LA RESPUESTA CON LAS CLAVES CORRECTAS
-        #    Estas claves deben coincidir con tu AdminDashboardData.fromJson en Flutter.
+        # ENSAMBLAJE DE LA RESPUESTA CON LAS CLAVES CORRECTAS
+        
         data = {
             'ventas_hoy': f"{ventas_hoy:.0f}",
             'ventas_ultimos_30_dias': f"{ventas_30_dias:.0f}",
