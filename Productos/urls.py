@@ -20,7 +20,6 @@ urlpatterns = [
     
     path('productos/', ProductoListCreateView.as_view(), name='producto-list-create'),
     
-    # --- INICIO DE CORRECCIÓN FINAL ---
     # Para la URL de detalle, especificamos explícitamente qué método HTTP
     # corresponde a cada acción estándar del ViewSet.
     path('productos/<int:pk>/', ProductoRetrieveUpdateDestroyView.as_view({
@@ -29,9 +28,9 @@ urlpatterns = [
         'patch': 'partial_update',
         'delete': 'destroy'
     }), name='producto-detail'),
-    # --- FIN DE CORRECCIÓN FINAL ---
+   
     
-    # Esta línea ya era correcta y no necesita cambios.
+   
     path('productos/<int:pk>/dar-de-baja/', ProductoRetrieveUpdateDestroyView.as_view({'post': 'dar_de_baja'}), name='producto-dar-de-baja'),
     
     path('categorias/', CategoriaProductoListCreateView.as_view(), name='categoria-producto-list-create'),
