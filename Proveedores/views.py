@@ -3,17 +3,15 @@
 from rest_framework import generics, permissions
 from .models import Proveedor
 from .serializers import ProveedorSerializer
-# ✨ 1. Importamos la nueva clase de permiso y eliminamos la antigua
 from Roles_Permisos.permissions import HasPrivilege
 from rest_framework.exceptions import ValidationError
 
 class ProveedorListCreateView(generics.ListCreateAPIView):
     queryset = Proveedor.objects.all().order_by('nombre')
     serializer_class = ProveedorSerializer
-    # ✨ 2. Reemplazamos el sistema de permisos
     permission_classes = [permissions.IsAuthenticated, HasPrivilege]
 
-    # ✨ 3. Definimos los privilegios para cada acción
+    # Definimos los privilegios para cada acción
     def get_required_privilege(self, method):
         if method == 'GET':
             return 'proveedores_ver'
@@ -39,10 +37,9 @@ class ProveedorListCreateView(generics.ListCreateAPIView):
 class ProveedorRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Proveedor.objects.all()
     serializer_class = ProveedorSerializer
-    # ✨ 2. Reemplazamos el sistema de permisos
     permission_classes = [permissions.IsAuthenticated, HasPrivilege]
 
-    # ✨ 3. Definimos los privilegios para cada acción
+    #  Definimos los privilegios para cada acción
     def get_required_privilege(self, method):
         if method == 'GET':
             return 'proveedores_ver'
