@@ -2,7 +2,7 @@
 from django.db import models
 
 class Permiso(models.Model):
-    # ✨ --- INICIO DE CAMPOS MODIFICADOS --- ✨
+    
     nombre = models.CharField(
         max_length=100,
         verbose_name="Nombre legible del Permiso",
@@ -19,7 +19,7 @@ class Permiso(models.Model):
         verbose_name="Módulo",
         help_text="El módulo al que pertenece este permiso. Ej: Ventas"
     )
-    # ✨ --- FIN DE CAMPOS MODIFICADOS --- ✨
+    
 
     def __str__(self):
         return self.nombre
@@ -31,7 +31,7 @@ class Permiso(models.Model):
         ordering = ['modulo', 'nombre']
 
 class Rol(models.Model):
-    # --- ESTE MODELO NO NECESITA NINGÚN CAMBIO ---
+   
     nombre = models.CharField(
         max_length=100,
         unique=True,
