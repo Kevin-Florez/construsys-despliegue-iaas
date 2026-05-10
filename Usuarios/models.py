@@ -4,8 +4,6 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-# Se elimina la importación directa de modelos de otras apps
-# from Roles_Permisos.models import Rol
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
