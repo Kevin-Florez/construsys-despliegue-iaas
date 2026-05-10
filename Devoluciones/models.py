@@ -5,7 +5,6 @@ from decimal import Decimal
 
 class Devolucion(models.Model):
     ESTADO_CHOICES = [('PROCESANDO', 'Procesando'), ('COMPLETADA', 'Completada'), ('CANCELADA', 'Cancelada')]
-    # IMPLEMENTACIÓN: Se elimina la opción 'PENDIENTE' del TIPO_REEMBOLSO_CHOICES.
     TIPO_REEMBOLSO_CHOICES = [('AL_CREDITO', 'Abonado al Crédito'), ('EFECTIVO', 'Reembolsado en Efectivo'), ('SIN_REEMBOLSO', 'Sin Reembolso (Cambio Exacto o a Favor)')]
     ESTADO_CAMBIO_CHOICES = [('SIN_CAMBIO', 'Sin cambio de producto'), ('MISMO_PRODUCTO', 'Cambio por el mismo producto'), ('OTRO_PRODUCTO', 'Cambio por un producto diferente')]
     
