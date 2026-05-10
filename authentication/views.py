@@ -39,10 +39,10 @@ class UnifiedLoginView(APIView):
         if serializer.is_valid():
             user_or_cliente_instance = serializer.validated_data["user"]
             
-            # La función get_tokens_for_user ahora hace todo el trabajo.
+            # La función get_tokens_for_user hace todo el trabajo.
             tokens = get_tokens_for_user(user_or_cliente_instance)
 
-            # La respuesta ahora solo devuelve los tokens, porque toda la información
+            # La respuesta olo devuelve los tokens, porque toda la información
             # necesaria ya está dentro del token de acceso.
             return Response(tokens, status=status.HTTP_200_OK)
             
@@ -315,7 +315,7 @@ class CheckDocumentoView(APIView):
         if Cliente.objects.filter(tipo_documento=tipo_documento, documento=documento).exists():
             return Response(
                 {'error': 'Este número de documento ya está registrado.'},
-                status=status.HTTP_409_CONFLICT # 409 Conflict es un buen código para "ya existe"
+                status=status.HTTP_409_CONFLICT # 409 Conflict código para "ya existe"
             )
         
         return Response(
