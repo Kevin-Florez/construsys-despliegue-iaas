@@ -70,14 +70,13 @@ class UsuarioCreateSerializer(serializers.ModelSerializer):
         return value
 
 
-    # ✨ --- INICIO DE LA CORRECCIÓN --- ✨
+   
     def create(self, validated_data):
         temp_password = secrets.token_urlsafe(10)
 
         # 1. Extraemos el email del diccionario. Esto lo obtiene Y lo elimina.
         email = validated_data.pop('email')
         
-        # 2. Ahora validated_data ya no tiene la clave 'email', por lo que no hay duplicados.
         user = User.objects.create_user(
             email=email,
             password=temp_password,
@@ -86,7 +85,7 @@ class UsuarioCreateSerializer(serializers.ModelSerializer):
         user.must_change_password = True
         user.save()
 
-        # Lógica de envío de correo (sin cambios)
+        # Lógica de envío de correo
         subject = 'Bienvenido/a - Credenciales de Acceso al Sistema'
         message = (
             f'Hola {user.first_name},\n\n'
@@ -103,7 +102,7 @@ class UsuarioCreateSerializer(serializers.ModelSerializer):
             print(f"ALERTA: Email de bienvenida no pudo ser enviado a {user.email}. Error: {e}")
 
         return user
-    # ✨ --- FIN DE LA CORRECCIÓN --- ✨
+    
 
 class UsuarioUpdateSerializer(serializers.ModelSerializer):
     rol = serializers.PrimaryKeyRelatedField(
