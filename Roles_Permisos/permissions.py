@@ -38,7 +38,7 @@ class HasPrivilege(BasePermission):
         if not hasattr(request.user, 'rol') or not request.user.rol or not request.user.rol.activo:
             return False
 
-        # ✨ --- INICIO DE LA LÓGICA MEJORADA --- ✨
+        ✨
         # Si el permiso requerido es para 'ver', comprobamos si tiene CUALQUIER privilegio del módulo.
         if required_privilege.endswith('_ver'):
             # Extraemos el nombre del módulo. Ej: 'ventas_ver' -> 'ventas'
@@ -51,7 +51,7 @@ class HasPrivilege(BasePermission):
         # Si el permiso no es de 'ver' (ej: 'ventas_crear'), se mantiene la lógica original
         # de buscar el privilegio exacto.
         return request.user.rol.permisos.filter(codename=required_privilege).exists()
-        # ✨ --- FIN DE LA LÓGICA MEJORADA --- ✨
+       
 
 class IsAdminOrReadOnly(permissions.BasePermission):
     """
