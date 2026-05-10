@@ -20,12 +20,11 @@ urlpatterns = [
     path('register/admin/', RegistrationView.as_view(), name='admin_user_registration'),
     path('register/', ClienteRegistrationView.as_view(), name='cliente_public_register'),
 
-    # Verificación de Email (sin cambios)
+    # Verificación de Email
     path('check-email/', CheckEmailView.as_view(), name='check_email'),
 
- 
 
-    # Añadimos las nuevas rutas genéricas
+    # rutas genéricas
     path('password/reset/', UnifiedPasswordResetRequestView.as_view(), name='password_reset_request'),
     path('password/reset/confirm/<uuid:token>/', UnifiedPasswordResetConfirmView.as_view(), name='password_reset_confirm'),
    
